@@ -1,0 +1,98 @@
+[
+  {
+    "name": "MABOT",
+    "lat": 0.413889,
+    "lng": 117.165556,
+    "type": "Conventional"
+  },
+  {
+    "name": "ELANG",
+    "lat": -0.926667,
+    "lng": 114.834167,
+    "type": "Conventional"
+  },
+  {
+    "name": "SOSVO",
+    "lat": 2.2725,
+    "lng": 117.416667,
+    "type": "Conventional"
+  },
+  {
+    "name": "DOMKI",
+    "lat": -1.025,
+    "lng": 118.5225,
+    "type": "Conventional"
+  },
+  {
+    "name": "HAMOL",
+    "lat": -1.770556,
+    "lng": 115.339722,
+    "type": "Conventional"
+  },
+  {
+    "name": "TUTKU",
+    "lat": -2.323056,
+    "lng": 115.843611,
+    "type": "Conventional"
+  },
+  {
+    "name": "GABUS",
+    "lat": -0.008889,
+    "lng": 118.986111,
+    "type": "Conventional"
+  },
+  {
+    "name": "AGUSI",
+    "lat": 0.128611,
+    "lng": 117.126944,
+    "type": "PBN"
+  },
+  {
+    "name": "AGTAK",
+    "lat": -0.9675,
+    "lng": 116.978056,
+    "type": "PBN"
+  },
+  {
+    "name": "NUGRO",
+    "lat": -0.164167,
+    "lng": 114.978889,
+    "type": "PBN"
+  },
+  {
+    "name": "SILJA",
+    "lat": -1.686944,
+    "lng": 115.2275,
+    "type": "PBN"
+  },
+  {
+    "name": "AJAMA",
+    "lat": -1.871944,
+    "lng": 115.413889,
+    "type": "PBN"
+  },
+  {
+    "name": "KAYAN",
+    "lat": -2.231944,
+    "lng": 115.775833,
+    "type": "PBN"
+  },
+  {
+    "name": "JIDAR",
+    "lat": -2.396667,
+    "lng": 115.941667,
+    "type": "PBN"
+  },
+  {
+    "name": "ELAPA",
+    "lat": -0.365278,
+    "lng": 118.443333,
+    "type": "PBN"
+  },
+  {
+    "name": "BIKPI",
+    "lat": -0.615,
+    "lng": 118.471667,
+    "type": "PBN"
+  }
+]
