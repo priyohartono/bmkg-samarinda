@@ -1,45 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Tambah useEffect
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Search, Calendar, User, ArrowRight, Tag } from "lucide-react";
+import { Search, Calendar, User, ArrowRight, Tag, ChevronLeft, ChevronRight } from "lucide-react"; // Tambah Icon Navigasi
 import { MOCK_NEWS } from "@/lib/data-dummy";
 
-// --- Tipe Data Dummy ---
-type NewsItem = {
-  id: number;
-  title: string;
-  slug: string;
-  category: "Berita" | "Kegiatan" | "Edukasi";
-  date: string;
-  author: string;
-  excerpt: string;
-  image: string;
-  isFeatured?: boolean; // Penanda untuk berita utama
-};
+const ITEMS_PER_PAGE = 6; // Tampilkan 6 berita per halaman di grid
 
 export default function BeritaClient() {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
+  
+  // State Pagination
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Filter logic sederhana
+  // 1. Filter Logic
   const filteredNews = MOCK_NEWS.filter((item) => {
     const matchSearch = item.title.toLowerCase().includes(search.toLowerCase());
     const matchCategory = filterCategory === "All" || item.category === filterCategory;
     return matchSearch && matchCategory;
   });
 
-  // Pisahkan Featured News (jika tidak ada filter/search)
+  // 2. Pisahkan Featured News (Hanya muncul jika tidak ada search/filter aktif)
+  // Logic: Featured News tidak ikut dipaginasi di grid bawah
   const featuredNews = search === "" && filterCategory === "All" 
-    ? MOCK_NEWS.find((item) => item.isFeatured) 
+    ? filteredNews.find((item) => item.isFeatured) 
     : null;
 
-  // Sisa berita (kecuali yang featured, jika featured sedang ditampilkan)
+  // 3. Sisa berita untuk Grid List
   const listNews = featuredNews 
     ? filteredNews.filter(item => item.id !== featuredNews.id) 
     : filteredNews;
+
+  // 4. Logika Pagination untuk List News
+  const totalPages = Math.ceil(listNews.length / ITEMS_PER_PAGE);
+  const currentListNews = listNews.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  // Reset ke halaman 1 jika filter berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filterCategory]);
+
+  // Handler ganti halaman
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    // Scroll sedikit ke bawah agar fokus ke grid (opsional, sesuaikan kebutuhan)
+    const gridElement = document.getElementById("news-grid");
+    if (gridElement) {
+        gridElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 pt-24 px-4 sm:px-6 lg:px-8">
@@ -97,7 +112,7 @@ export default function BeritaClient() {
         </div>
 
         {/* --- Featured News (Hero) --- */}
-        {featuredNews && (
+        {featuredNews && currentPage === 1 && ( // Opsional: Hero hanya muncul di page 1
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -142,79 +157,99 @@ export default function BeritaClient() {
         )}
 
         {/* --- List News (Grid) --- */}
-        {listNews.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {listNews.map((news, index) => (
-              <motion.div
-                key={news.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link href={`/publikasi/berita-kegiatan/${news.slug}`} className="group flex flex-col h-full bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 overflow-hidden transition-all">
-                  {/* Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={news.image}
-                      alt={news.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-semibold px-2 py-1 rounded shadow-sm">
-                      {news.category}
-                    </div>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="p-5 flex flex-col flex-grow">
-                    <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {news.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <User className="w-3 h-3" /> {news.author}
-                      </span>
+        <div id="news-grid" className="scroll-mt-24"> {/* ID untuk target scroll */}
+            {currentListNews.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {currentListNews.map((news, index) => (
+                <motion.div
+                    key={news.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                >
+                    <Link href={`/publikasi/berita-kegiatan/${news.slug}`} className="group flex flex-col h-full bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 overflow-hidden transition-all">
+                    {/* Image */}
+                    <div className="relative h-48 overflow-hidden">
+                        <Image
+                        src={news.image}
+                        alt={news.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-semibold px-2 py-1 rounded shadow-sm">
+                        {news.category}
+                        </div>
                     </div>
                     
-                    <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {news.title}
-                    </h3>
-                    
-                    <p className="text-gray-500 text-sm mb-4 line-clamp-3 flex-grow">
-                      {news.excerpt}
-                    </p>
-                    
-                    <div className="pt-4 border-t border-gray-100 flex justify-end">
-                       <span className="text-blue-600 text-xs font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                         Baca <ArrowRight className="w-3 h-3" />
-                       </span>
+                    {/* Content */}
+                    <div className="p-5 flex flex-col flex-grow">
+                        <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+                        <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" /> {news.date}
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <User className="w-3 h-3" /> {news.author}
+                        </span>
+                        </div>
+                        
+                        <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        {news.title}
+                        </h3>
+                        
+                        <p className="text-gray-500 text-sm mb-4 line-clamp-3 flex-grow">
+                        {news.excerpt}
+                        </p>
+                        
+                        <div className="pt-4 border-t border-gray-100 flex justify-end">
+                        <span className="text-blue-600 text-xs font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            Baca <ArrowRight className="w-3 h-3" />
+                        </span>
+                        </div>
                     </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          /* Empty State */
-          <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
-            <p className="text-gray-500">Tidak ada berita yang ditemukan.</p>
-            <button 
-                onClick={() => { setSearch(""); setFilterCategory("All"); }}
-                className="mt-2 text-blue-600 text-sm hover:underline"
-            >
-                Reset Filter
-            </button>
-          </div>
-        )}
+                    </Link>
+                </motion.div>
+                ))}
+            </div>
+            ) : (
+            /* Empty State */
+            <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
+                <p className="text-gray-500">Tidak ada berita yang ditemukan.</p>
+                <button 
+                    onClick={() => { setSearch(""); setFilterCategory("All"); }}
+                    className="mt-2 text-blue-600 text-sm hover:underline"
+                >
+                    Reset Filter
+                </button>
+            </div>
+            )}
+        </div>
 
-        {/* --- Pagination (Dummy) --- */}
-        {listNews.length > 0 && (
-            <div className="mt-12 flex justify-center gap-2">
-                <button disabled className="px-4 py-2 text-sm text-gray-400 bg-white border border-gray-200 rounded-lg cursor-not-allowed">Prev</button>
-                <button className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg font-medium">1</button>
-                <button className="px-4 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">2</button>
-                <button className="px-4 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">Next</button>
+        {/* --- PAGINATION (UPDATED STYLE) --- */}
+        {listNews.length > ITEMS_PER_PAGE && (
+            <div className="mt-12 flex justify-center items-center gap-4">
+                {/* Previous Button */}
+                <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-gray-600"
+                >
+                    <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                {/* Page Indicator */}
+                <span className="text-sm font-medium text-gray-600">
+                    Halaman <span className="text-blue-600 font-bold">{currentPage}</span> dari {totalPages}
+                </span>
+
+                {/* Next Button */}
+                <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-gray-600"
+                >
+                    <ChevronRight className="w-5 h-5" />
+                </button>
             </div>
         )}
 
