@@ -32,7 +32,7 @@ export default function PostForm({ initialData }: PostFormProps) {
     const file = e.target.files[0];
 
     // 1. Validasi Ukuran (Maks 2 MB)
-    const maxSizeMB = 2;
+    const maxSizeMB = 1;
     if (file.size > maxSizeMB * 1024 * 1024) {
         alert(`Gambar terlalu besar! Maksimal ${maxSizeMB} MB.`);
         e.target.value = "";
@@ -64,7 +64,7 @@ export default function PostForm({ initialData }: PostFormProps) {
   return (
     <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl border border-gray-200">
       <h1 className="text-xl font-bold mb-6">
-        {isEditMode ? "Edit Berita" : "Tulis Berita Baru"}
+        {isEditMode ? "Edit Berita" : "Tambah Berita Baru"}
       </h1>
       
       <form action={handleSubmit} className="space-y-6">

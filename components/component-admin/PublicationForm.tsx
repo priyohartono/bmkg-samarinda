@@ -36,7 +36,7 @@ export default function PublicationForm({ initialData }: PublicationFormProps) {
     const file = e.target.files[0];
 
     // --- 1. VALIDASI UKURAN FILE ---
-    const maxSizeMB = isPdf ? 10 : 2; // PDF 10MB, Gambar 2MB
+    const maxSizeMB = isPdf ? 5 : 1; // PDF 10MB, Gambar 2MB
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
@@ -88,9 +88,9 @@ export default function PublicationForm({ initialData }: PublicationFormProps) {
             onChange={(e) => setType(e.target.value)}
             className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           >
-             <option value="Buletin">Buletin (Bulanan)</option>
-             <option value="Artikel">Artikel (Populer)</option>
-             <option value="Makalah">Makalah (Teknis/Jurnal)</option>
+             <option value="Buletin">Buletin</option>
+             <option value="Artikel">Artikel</option>
+             <option value="Makalah">Makalah</option>
           </select>
         </div>
 

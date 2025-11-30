@@ -8,7 +8,7 @@ import { Map } from "leaflet";
 import { AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
 
 import KecamatanCard, { DataKecamatan } from "./KecamatanCard";
-import kabupatenKaltimData from "@/public/geojson/WilayahKaltim.json";
+import kabupatenKaltimData from "@/public/geojson/WilayahKaltim1.json";
 import {
   useKecamatanSearch,
   KecamatanOption,

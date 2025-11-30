@@ -68,30 +68,16 @@ export default function BeritaClient({ initialData }: BeritaClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Header Section */}
-        <div className="text-center mb-12 space-y-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-4xl font-bold text-gray-800"
-          >
-            Berita & Kegiatan
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-gray-600 max-w-2xl mx-auto"
-          >
-            Informasi terkini seputar meteorologi, klimatologi, geofisika, serta kegiatan resmi Stasiun Meteorologi APT Pranoto Samarinda.
-          </motion.p>
-        </div>
+    <div className="w-full space-y-8">
+      
+        {/* HEADER BARU (Style Profil: Rata Kiri + Garis Bawah) */}
+      <div className="border-b text-center border-gray-200 pb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Berita & Kegiatan</h1>
+          <p className="text-gray-500">Informasi terkini seputar meteorologi, klimatologi, dan kegiatan stasiun.</p>
+      </div>
 
         {/* Search & Filter */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-10 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
           <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
             {["All", "Berita", "Kegiatan", "Edukasi"].map((cat) => (
               <button
@@ -140,7 +126,7 @@ export default function BeritaClient({ initialData }: BeritaClientProps) {
                     Utama
                   </div>
                 </div>
-                <div className="p-6 md:p-10 flex flex-col justify-center bg-gradient-to-br from-white to-blue-200">
+                <div className="p-6 md:p-10 flex flex-col justify-center bg-gradient-to-br from-white to-blue-500">
                   <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
                     <span className="flex items-center gap-1 text-blue-600 font-semibold">
                       <Tag className="w-3 h-3" /> {featuredNews.category}
@@ -257,6 +243,6 @@ export default function BeritaClient({ initialData }: BeritaClientProps) {
         )}
 
       </div>
-    </div>
   );
+
 }

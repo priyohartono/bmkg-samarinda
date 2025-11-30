@@ -1,34 +1,15 @@
 import { NextResponse } from "next/server";
+import { getGempaTerbaru } from "@/lib/gempa-bmkg";
 
 export async function GET() {
-  try {
-    const res = await fetch(
-      "https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json"
-    );
+  const data = await getGempaTerbaru();
 
-    if (!res.ok) {
-      throw new Error("Gagal fetch data BMKG");
-    }
-
-    const data = await res.json();
-    const gempa = data.Infogempa.gempa;
-
-    // tambahkan URL gambar biar langsung siap dipakai
-    const shakemapUrl = `https://data.bmkg.go.id/DataMKG/TEWS/${gempa.Shakemap}`;
-
-    return NextResponse.json({
-      ...data,
-      Infogempa: {
-        gempa: {
-          ...gempa,
-          ShakemapUrl: shakemapUrl,
-        },
-      },
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Terjadi kesalahan", error: (error as Error).message },
-      { status: 500 }
-    );
+  if (!data) {
+    return NextResponse.json({ message: "Gagal mengambil data" }, { status: 500 });
   }
+
+  return NextResponse.json({
+    success: true,
+    data,
+  });
 }

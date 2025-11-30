@@ -1,4 +1,4 @@
-import { BeritaSkeleton } from "@/components/component-publikasi/Skeletons";
+import { BeritaPageSkeleton } from "@/components/component-publikasi/Skeletons";
 
 export default function Loading() {
   return (
@@ -11,7 +11,7 @@ export default function Loading() {
         </div>
         
         {/* Panggil Skeleton Grid */}
-        <BeritaSkeleton />
+        <BeritaPageSkeleton />
       </div>
     </div>
   );

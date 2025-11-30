@@ -72,27 +72,14 @@ export default function BuletinClient({ initialData }: BuletinClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full space-y-8">
         
         {/* Header */}
-        <div className="text-center mb-12 space-y-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-4xl font-bold text-gray-800"
-          >
-            Arsip Buletin
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-gray-600 max-w-2xl mx-auto"
-          >
-            Kumpulan publikasi buletin analisis cuaca, iklim, dan kualitas udara. 
-            Silakan pilih tahun terbitan untuk menemukan dokumen yang Anda butuhkan.
-          </motion.p>
-        </div>
+      <div className="border-b text-center border-gray-200 pb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Buletin</h1>
+          <p className="text-gray-500">Kumpulan publikasi buletin analisis cuaca, iklim, dan kualitas udara. 
+            Silakan pilih tahun terbitan untuk menemukan dokumen yang Anda butuhkan.</p>
+      </div>
 
         {/* Filter Section */}
         <div className="flex justify-center mb-10">
@@ -250,6 +237,5 @@ export default function BuletinClient({ initialData }: BuletinClientProps) {
           )}
         </AnimatePresence>
       </div>
-    </div>
   );
 }

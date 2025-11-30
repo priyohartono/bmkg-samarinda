@@ -57,25 +57,12 @@ export default function PublikasiListClient({ initialData }: PublikasiListProps)
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="w-full space-y-8">
         
         {/* Header */}
-        <div className="text-center mb-10 space-y-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-4xl font-bold text-gray-800"
-          >
-            Artikel & Makalah Ilmiah
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-gray-600 max-w-2xl mx-auto"
-          >
-            Repositori pengetahuan BMKG Samarinda. Kumpulan dokumen kajian teknis dan informasi populer.
-          </motion.p>
+        <div className="border-b text-center border-gray-200 pb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Artikel & Makalah</h1>
+          <p className="text-gray-500">Repositori pengetahuan BMKG Samarinda. Kumpulan dokumen kajian teknis dan informasi populer.</p>
         </div>
 
         {/* Controls */}
@@ -261,6 +248,5 @@ export default function PublikasiListClient({ initialData }: PublikasiListProps)
           )}
         </AnimatePresence>
       </div>
-    </div>
   );
 }
