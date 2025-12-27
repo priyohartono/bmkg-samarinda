@@ -144,7 +144,7 @@ export default function KarhutlaStaticMaps() {
       {/* 3. LIGHTBOX PREVIEW */}
       {previewImage && (
         <div className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200" onClick={() => setPreviewImage(null)}>
-            <div className="relative w-full h-full md:h-auto md:max-w-5xl md:max-h-[90vh] bg-white md:rounded-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="relative w-full md:h-auto md:max-w-4xl md:max-h-[85vh] bg-white md:rounded-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white z-10 shrink-0">
                     <div>
                         <h3 className="font-bold text-gray-900 text-sm md:text-lg line-clamp-1">{previewImage.title}</h3>

@@ -15,11 +15,22 @@ export interface HotspotData {
 }
 
 // GET (Public)
+// lib/data-karhutla.ts
+
 export async function getHotspots() {
   try {
+    // 1. Tentukan rentang waktu "HARI INI" (Mulai jam 00:00)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+
     const data = await prisma.hotspot.findMany({
+      where: {
+        // FILTER: Hanya ambil data yang tanggalnya >= Hari Ini
+        date: {
+          gte: today 
+        }
+      },
       orderBy: { date: 'desc' },
-      take: 500 // Batasi agar peta tidak berat jika data ribuan
     });
     
     return data.map(h => ({
@@ -101,4 +112,43 @@ export async function clearHotspots() {
   await prisma.hotspot.deleteMany({});
   revalidatePath("/cuaca/karhutla");
   return { success: true };
+}
+
+
+
+// ... imports existing
+
+// Tambahkan fungsi ini
+export async function getHotspotTrend() {
+  // 1. Generate 7 hari terakhir
+  const dates = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().split('T')[0]); // Format YYYY-MM-DD
+  }
+
+  try {
+    // 2. Query GroupBy Date (Raw Query atau JS processing)
+    // Karena Prisma GroupBy agak tricky dengan DateTime, kita tarik data 7 hari terakhir lalu hitung di JS
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const data = await prisma.hotspot.findMany({
+      where: {
+        date: { gte: sevenDaysAgo }
+      },
+      select: { date: true }
+    });
+
+    // 3. Mapping count per tanggal
+    const stats = dates.map(dateStr => {
+      const count = data.filter(d => d.date.toISOString().split('T')[0] === dateStr).length;
+      return { date: dateStr, count };
+    });
+
+    return stats;
+  } catch (error) {
+    return dates.map(d => ({ date: d, count: 0 }));
+  }
 }

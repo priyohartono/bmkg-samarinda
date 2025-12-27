@@ -29,6 +29,10 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
+        protocol: "https",
+        hostname: "web-aviation.bmkg.go.id"
+      },
+      {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },

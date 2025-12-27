@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Flame, Map as MapIcon, Info } from "lucide-react";
-import { getHotspots } from "@/lib/data-karhutla";
+import { getHotspots, getHotspotTrend } from "@/lib/data-karhutla"; // Import getHotspotTrend
 import HotspotMapWrapper from "@/components/component-cuaca/karhutla/HotspotMapWrapper";
 import KarhutlaStaticMaps from "@/components/component-cuaca/karhutla/KarhutlaStaticMaps"; 
+import KarhutlaStats from "@/components/component-cuaca/karhutla/KarhutlaStats"; // Import Komponen Baru
 
 export const metadata: Metadata = {
   title: "Peringatan Karhutla | BMKG Samarinda",
@@ -10,7 +11,11 @@ export const metadata: Metadata = {
 };
 
 export default async function KarhutlaPage() {
-  const hotspots = await getHotspots();
+  // Fetch Data Parallel agar cepat
+  const [hotspots, trendData] = await Promise.all([
+    getHotspots(),
+    getHotspotTrend()
+  ]);
 
   return (
     <div className="space-y-10 w-full">
@@ -28,17 +33,22 @@ export default async function KarhutlaPage() {
             </p>
             <div className="mt-3 inline-flex items-center gap-2 bg-white px-3 py-1 rounded-lg border border-red-100 text-xs font-bold text-red-600">
                 <Info className="w-3 h-3" />
-                Terdeteksi: {hotspots.length} Titik Panas
+                Terdeteksi Hari Ini: {hotspots.length} Titik Panas
             </div>
         </div>
       </section>
 
-      {/* PETA INTERAKTIF HOTSPOT */}
+      {/* PETA INTERAKTIF */}
       <section>
         <HotspotMapWrapper data={hotspots} />
       </section>
 
-      {/* --- BAGIAN BAWAH: PETA STATIS (SPARTAN) --- */}
+      {/* --- STATISTIK & HIMBAUAN (BARU) --- */}
+      <section>
+        <KarhutlaStats trend={trendData} />
+      </section>
+
+      {/* PETA ANALISIS SPARTAN */}
       <section className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 border-b border-gray-200 pb-3">
             <div className="flex items-center gap-3">
@@ -49,10 +59,7 @@ export default async function KarhutlaPage() {
                 </div>
             </div>
         </div>
-
-        {/* Panggil Komponen Peta Statis */}
         <KarhutlaStaticMaps />
-        
       </section>
 
     </div>
