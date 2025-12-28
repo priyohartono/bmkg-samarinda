@@ -266,7 +266,7 @@ function RouteWeatherCard({ origin, destination }: { origin: ParsedMetar, destin
                     <div className="flex flex-col items-center">
                         <div className="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Origin</div>
                         <div className="text-3xl md:text-5xl font-black font-mono text-white tracking-tighter leading-none">{origin.icao_id}</div>
-                        <div className="text-sm font-medium text-emerald-400 mt-2 truncate max-w-[120px]">{origin.station_name.split('-')[0].trim()}</div>
+                        <div className="text-sm font-medium text-emerald-400 mt-2 truncate w-full">{origin.station_name.split('-')[0].trim()}</div>
                     </div>
 
                     {/* Path Visualizer (Center) */}
@@ -278,14 +278,14 @@ function RouteWeatherCard({ origin, destination }: { origin: ParsedMetar, destin
                             </div>
                             <div className="h-[2px] w-full bg-slate-700 rounded-full"></div>
                         </div>
-                        <span className="text-[10px] font-mono text-slate-400 mt-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">{distance} km</span>
+                        <span className="text-sm text-slate-400 mt-2 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">{distance} km</span>
                     </div>
 
                     {/* Destination (Center Align) */}
                     <div className="flex flex-col items-center">
                         <div className="text-xs text-slate-400 uppercase font-bold tracking-widest mb-1">Destination</div>
                         <div className="text-3xl md:text-5xl font-black font-mono text-white tracking-tighter leading-none">{destination.icao_id}</div>
-                        <div className="text-sm font-medium text-blue-400 mt-2 truncate max-w-[120px]">{destination.station_name.split('-')[0].trim()}</div>
+                        <div className="text-sm font-medium text-blue-400 mt-2 truncate w-full">{destination.station_name.split('-')[0].trim()}</div>
                     </div>
 
                 </div>
@@ -316,49 +316,50 @@ function WeatherColumn({ airport, color }: { airport: ParsedMetar, color: 'emera
     const accentColor = color === 'emerald' ? 'text-emerald-400' : 'text-blue-400';
 
     return (
-        <div className="flex flex-col items-center text-center">
+        // Tambahkan w-full agar grid bisa melebar
+        <div className="flex flex-col items-center text-center w-full">
             
-            {/* Main Icon & Temp (Center) */}
-            <div className="flex flex-col items-center gap-2 mb-6">
-                <div className="w-16 h-16 relative filter drop-shadow-lg shrink-0">
+            {/* Main Icon & Temp (Tetap di Tengah Atas) */}
+            <div className="flex flex-col items-center gap-2 mb-8">
+                <div className="w-20 h-20 relative filter drop-shadow-xl shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={iconUrl} alt="Weather Icon" className="w-full h-full object-contain" />
                 </div>
                 <div>
-                    <div className="text-4xl font-bold text-white leading-none mb-1">{airport.temp}°</div>
-                    <div className={`text-sm font-medium ${accentColor} leading-tight`}>{humanWeather}</div>
+                    <div className="text-5xl font-black text-white leading-none mb-1 tracking-tight">{airport.temp}°</div>
+                    <div className={`text-sm font-bold uppercase ${accentColor} leading-tight`}>{humanWeather}</div>
                 </div>
             </div>
 
-            {/* Data List (Center) */}
-            <div className="w-full space-y-4 font-mono text-sm">
+            {/* Data List: Mobile (1 Col) -> Desktop (3 Cols) */}
+            <div className="w-full text-sm grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-2 border-t border-slate-800/50 pt-6">
                 
                 {/* Wind */}
                 <div className="flex flex-col items-center gap-1">
-                    <div className="flex items-center gap-2 text-slate-400 text-xs uppercase tracking-wider">
+                    <div className="flex items-center gap-2 text-slate-500 text-sm uppercase  font-bold mb-1">
                         <Wind className="w-3 h-3"/> Angin
                     </div>
-                    <div className="text-slate-200 font-bold">{airport.wind_speed} <span className="text-xs text-slate-500 font-normal">km/j</span></div>
-                    <div className="text-[10px] text-slate-500 uppercase">{airport.wind_direction}</div>
+                    <div className="text-slate-200 font-bold whitespace-nowrap">{airport.wind_speed} <span className="text-sm text-slate-500 font-normal">km/j</span></div>
+                    <div className="text-sm text-emerald-400 uppercase font-bold">{airport.wind_direction}</div>
                 </div>
 
                 {/* Visibility */}
-                <div className="flex flex-col items-center gap-1">
-                    <div className="flex items-center gap-2 text-slate-400 text-xs uppercase tracking-wider">
-                        <Eye className="w-3 h-3"/> Visibility
+                <div className="flex flex-col items-center gap-1 border-t md:border-t-0 md:border-l md:border-r border-slate-800/50 pt-4 md:pt-0">
+                    <div className="flex items-center gap-2 text-slate-500 text-sm uppercase font-bold mb-1">
+                        <Eye className="w-3 h-3"/> Visibilitas
                     </div>
-                    <div className="text-slate-200 font-bold">{airport.visibility} <span className="text-xs text-slate-500 font-normal">km</span></div>
+                    <div className="text-slate-200 font-bold whitespace-nowrap">{airport.visibility} <span className="text-sm text-slate-500 font-normal">km</span></div>
                 </div>
 
                 {/* Pressure & Dew */}
-                <div className="flex flex-col items-center gap-1">
-                    <div className="flex items-center gap-2 text-slate-400 text-xs uppercase tracking-wider">
-                        <Gauge className="w-3 h-3"/> QNH / Dew
+                <div className="flex flex-col items-center gap-1 border-t md:border-t-0 border-slate-800/50 pt-4 md:pt-0">
+                    <div className="flex items-center gap-2 text-slate-500 text-sm uppercase  font-bold mb-1">
+                        <Gauge className="w-3 h-3"/> QNH
                     </div>
-                    <div className="text-slate-200 font-bold">
-                        {airport.pressure} <span className="text-xs text-slate-500 font-normal">hPa</span>
+                    <div className="text-slate-200 font-bold whitespace-nowrap">
+                        {airport.pressure} <span className="text-sm text-slate-500 font-normal">hPa</span>
                     </div>
-                    <div className="text-[10px] text-slate-500 uppercase">Dew Point {airport.dew_point}°</div>
+                    <div className="text-sm text-blue-400 uppercase font-bold">Dewpoint {airport.dew_point}°</div>
                 </div>
 
             </div>
