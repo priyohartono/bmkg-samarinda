@@ -1,6 +1,6 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Plus, Trash, Pencil } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import DeleteButton from "./delete-button";
 import FeaturedToggle from "./featured-toggle";
 

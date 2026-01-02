@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+/* eslint-disable @next/next/no-img-element */
 import { 
   CloudSun, Activity, Wind, Droplets, ArrowRight, MapPin, Calendar, Waves,
   Sun, Cloud, CloudRain, CloudLightning, CloudFog 
 } from "lucide-react";
+// Import Type yang sudah diperbaiki
 import type { GempaData } from "@/lib/bmkg/gempa";
 import type { CuacaData } from "@/lib/bmkg/cuaca";
 
@@ -17,10 +19,9 @@ interface InfoWidgetProps {
 export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
   const [activeTab, setActiveTab] = useState<"cuaca" | "gempa">("cuaca");
 
-  // PERBAIKAN: Tambahkan parameter 'sizeClass'
-  const getWeatherIcon = (code: string, sizeClass: string = "w-20 h-20") => {
+  // Fallback Icon jika gambar dari BMKG gagal load / null
+  const getFallbackIcon = (code: string, sizeClass: string = "w-20 h-20") => {
     const c = parseInt(code);
-    // Masukkan sizeClass ke dalam className icon
     if (c === 0 || c === 1 || c === 2) return <Sun className={`${sizeClass} text-yellow-500`} />;
     if (c === 3 || c === 4) return <Cloud className={`${sizeClass} text-gray-400`} />;
     if (c >= 5 && c <= 45) return <CloudFog className={`${sizeClass} text-slate-400`} />;
@@ -41,9 +42,9 @@ export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
                 activeTab === 'cuaca' ? 'bg-white text-blue-600 font-bold shadow-sm md:border-l-4 md:border-l-blue-600' : 'text-gray-500 hover:bg-gray-100'
             }`}
           >
-            {/* PERBAIKAN: Panggil dengan ukuran kecil (w-6 h-6) agar sama dengan Gempa */}
-            {dataCuaca ? (
-                getWeatherIcon(dataCuaca.kodeCuaca, "w-6 h-6") 
+            {/* Icon Tab Kecil */}
+            {dataCuaca?.iconUrl ? (
+                 <img src={dataCuaca.iconUrl} alt="icon" className="w-8 h-8 object-contain" />
             ) : <CloudSun className="w-6 h-6" />}
             <span>Cuaca</span>
           </button>
@@ -68,8 +69,19 @@ export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
                     {dataCuaca ? (
                         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                             <div className="flex items-center gap-4">
-                                {/* PERBAIKAN: Di sini biarkan default (w-20 h-20) agar tetap besar */}
-                                {getWeatherIcon(dataCuaca.kodeCuaca)}
+                                {/* ICON UTAMA: Prioritas Gambar API, Fallback ke Lucide */}
+                                {dataCuaca.iconUrl ? (
+                                    <div className="w-24 h-24 relative">
+                                        <img 
+                                            src={dataCuaca.iconUrl} 
+                                            alt={dataCuaca.cuaca}
+                                            className="w-full h-full object-contain drop-shadow-md scale-125"
+                                        />
+                                    </div>
+                                ) : (
+                                    getFallbackIcon(dataCuaca.kodeCuaca)
+                                )}
+
                                 <div>
                                     <h3 className="text-gray-500 font-medium text-sm md:text-base">
                                         {dataCuaca.wilayah}
@@ -115,7 +127,7 @@ export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
                 </div>
             )}
 
-            {/* KONTEN GEMPA (Biarkan Tetap Sama) */}
+            {/* KONTEN GEMPA (Sama seperti sebelumnya) */}
             {activeTab === "gempa" && (
                 <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {dataGempa ? (

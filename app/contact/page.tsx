@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Twitter, Youtube, Globe, Plane } from "lucide-react"; // Tambah Icon Plane
+import { MapPin, Mail, Clock, Facebook, Instagram, Twitter, Youtube, Globe, Plane } from "lucide-react"; // Tambah Icon Plane
 
 export const metadata: Metadata = {
   title: "Hubungi Kami | BMKG Samarinda",

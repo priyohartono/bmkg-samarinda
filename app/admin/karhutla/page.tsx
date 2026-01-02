@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { importHotspots, clearHotspots } from "@/lib/data-karhutla";
-import { Flame, Trash2, Save, AlertCircle } from "lucide-react";
+import { Trash2, Save, AlertCircle } from "lucide-react";
 
 export default function AdminKarhutlaPage() {
   const [rawData, setRawData] = useState("");

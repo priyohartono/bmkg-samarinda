@@ -1,4 +1,4 @@
-import { AlertTriangle, Clock, MapPin, Info, FileText, ExternalLink, ImageIcon } from "lucide-react";
+import {  Clock, Info, FileText, ExternalLink, ImageIcon } from "lucide-react";
 import { getLinkPeringatanDiniKaltim } from "@/lib/bmkg/warnings";
 import { getCAPAlertDetail } from "@/lib/bmkg/cap";
 import MapLoader from "@/components/component-cuaca/peringatan-dini/MapLoader";

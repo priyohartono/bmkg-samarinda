@@ -1,6 +1,6 @@
 // lib/bmkg/cuaca.ts
 
-// Tipe Data Sesuai JSON Baru
+// Tipe Data Sesuai JSON Baru (Internal)
 export interface WeatherItem {
   datetime: string;
   t: number;       // Suhu
@@ -26,6 +26,19 @@ export interface WeatherResponse {
   }[];
 }
 
+// --- PERBAIKAN: Tambahkan Interface CuacaData untuk Konsumsi Frontend ---
+export interface CuacaData {
+  wilayah: string;
+  cuaca: string;
+  kodeCuaca: string;
+  iconUrl: string; // Tambahan field untuk URL icon resmi BMKG
+  suhu: string;
+  kelembapan: string;
+  anginSpeed: string;
+  anginDir: string;
+  jam: string;
+}
+
 export async function getCuacaDetail(kodeWilayah: string = "64.72.09.1003"): Promise<WeatherResponse | null> {
   try {
     const res = await fetch(
@@ -42,9 +55,8 @@ export async function getCuacaDetail(kodeWilayah: string = "64.72.09.1003"): Pro
   }
 }
 
-// Fungsi Ringkas untuk Widget Home (Mengambil jam terdekat saja)
-// Kita gunakan logika yang sama, tapi return data simple
-export async function getCuacaSamarinda() {
+// Fungsi Ringkas untuk Widget Home
+export async function getCuacaSamarinda(): Promise<CuacaData | null> {
     const data = await getCuacaDetail();
     if (!data || !data.data[0]) return null;
 
@@ -63,7 +75,7 @@ export async function getCuacaSamarinda() {
     return {
         wilayah: data.lokasi.kotkab, // "Kota Samarinda"
         cuaca: current.weather_desc,
-        kodeCuaca: "0", // Kita abaikan kode manual, pakai image URL dari API langsung nanti
+        kodeCuaca: "0", // Fallback code, tapi kita akan utamakan iconUrl di frontend
         iconUrl: current.image, // URL Icon langsung dari BMKG!
         suhu: current.t.toString(),
         kelembapan: current.hu.toString(),

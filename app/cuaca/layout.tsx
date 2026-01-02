@@ -1,5 +1,4 @@
 import CuacaSidebar from "@/components/component-cuaca/Sidebar";
-import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 export default function CuacaLayout({ children }: { children: React.ReactNode }) {
   return (

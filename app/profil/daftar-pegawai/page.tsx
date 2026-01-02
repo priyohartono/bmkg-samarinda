@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { User, Award, Briefcase, Star } from "lucide-react";
+import { Award, Briefcase, Star } from "lucide-react";
 import { getPegawai } from "@/lib/data-pegawai"; // Import Fetcher
 
 export const metadata: Metadata = {

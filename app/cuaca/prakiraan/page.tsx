@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import WeatherSummary from "@/components/component-cuaca/prakiraan-cuaca/WeatherSummary";
-import { Loader2, MapPinOff, CloudRain } from "lucide-react";
+import { Loader2, MapPinOff} from "lucide-react";
 
 // Load LocationExplorer
 const LocationExplorer = dynamic(
@@ -24,7 +24,7 @@ export default function WeatherPage() {
     const [weatherData, setWeatherData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleLocationSelect = async (adm4Code: string, locationName: string) => {
+    const handleLocationSelect = async (adm4Code: string) => {
         setIsLoading(true);
         setError(null);
         try {

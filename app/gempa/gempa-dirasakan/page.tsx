@@ -1,5 +1,5 @@
 import { getGempaDirasakanList } from "@/lib/bmkg/gempa";
-import { MapPin, Calendar, Clock, Radio, Info } from "lucide-react";
+import { MapPin, Calendar, Clock, Radio } from "lucide-react";
 
 export const revalidate = 60;
 

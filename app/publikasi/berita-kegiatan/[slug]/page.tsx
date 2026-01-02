@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Calendar, User, ArrowLeft, Share2, Clock, Home, ChevronRight } from "lucide-react";
+import { Calendar, User, Share2, Home, ChevronRight } from "lucide-react";
 import prisma from "@/lib/prisma"; // 1. Import Prisma
 // HAPUS import MOCK_NEWS
 
