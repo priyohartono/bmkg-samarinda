@@ -46,10 +46,10 @@ export default function WeatherPage() {
             
 
             {/* 2. CONTAINER KONTEN UTAMA */}
-            <div className="max-w-[1440px] mx-auto px-4 md:px-8 space-y-8">
+            <div className="max-w-[1440px] min-w-[340px] mx-auto px-2 md:px-4 space-y-8">
                 
                 {/* PETA & SELECTOR */}
-                <section className="relative z-0 shadow-2xl rounded-[2.5rem] overflow-hidden border border-slate-200 overflow-x-auto scrollbar-hide">
+                <section className="relative z-0 shadow-2xl rounded-3xl overflow-hidden border border-slate-200 overflow-x-auto scrollbar-hide">
                     <LocationExplorer onLocationSelect={handleLocationSelect} />
                 </section>
 

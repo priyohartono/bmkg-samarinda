@@ -114,19 +114,6 @@ export default function MaritimePage() {
         
         {/* --- HEADER --- */}
         <div className="space-y-6 border-b border-gray-200 pb-8">
-            {/* Judul & Deskripsi */}
-            <div className="text-center space-y-4">
-                <h1 className="text-3xl font-bold text-gray-900">Prakiraan Cuaca Maritim</h1>
-                
-                {/* Info Box (Sesuai Referensi) */}
-                <div className="w-full bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3 items-start text-left md:text-center mx-auto">
-                    <Ship className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5 md:hidden" /> {/* Icon hanya muncul di HP biar rapi */}
-                    <p className="text-gray-600 text-sm leading-relaxed w-full">
-                        Peringatan dini dan informasi cuaca untuk wilayah Perairan & Pelabuhan Kalimantan Timur dalam tampilan peta interaktif. 
-                        Data diambil dari sistem pemodelan maritim BMKG.
-                    </p>
-                </div>
-            </div>
 
             {/* Toggle Switch (Centered) */}
             <div className="flex justify-center">

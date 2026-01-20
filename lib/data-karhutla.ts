@@ -19,20 +19,19 @@ export interface HotspotData {
 
 export async function getHotspots() {
   try {
-    // 1. Tentukan rentang waktu "HARI INI" (Mulai jam 00:00)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    // 1. Tentukan rentang waktu "24 Jam Terakhir"
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const data = await prisma.hotspot.findMany({
       where: {
-        // FILTER: Hanya ambil data yang tanggalnya >= Hari Ini
+        // FILTER: Data valid 24 jam terakhir
         date: {
-          gte: today 
+          gte: oneDayAgo
         }
       },
       orderBy: { date: 'desc' },
     });
-    
+
     return data.map(h => ({
       id: h.id,
       lat: h.latitude,
@@ -55,7 +54,7 @@ export async function importHotspots(rawData: string) {
   try {
     // 1. Hapus data lama (Opsional: agar peta selalu fresh hari ini)
     // await prisma.hotspot.deleteMany({}); 
-    
+
     // 2. Parsing Data
     const rows = rawData.trim().split('\n');
     const validData = [];
@@ -63,8 +62,8 @@ export async function importHotspots(rawData: string) {
     for (const row of rows) {
       // Asumsi format: Long | Lat | Conf | Region | Prov | Kab | Kec | Sat | Date | Time ...
       // Split by Tab (\t) atau Spasi berulang
-      const cols = row.split(/\t/); 
-      
+      const cols = row.split(/\t/);
+
       if (cols.length < 8) continue; // Skip baris rusak
 
       const lng = parseFloat(cols[0]); // Longitude biasanya kolom pertama di data Sipongi
@@ -75,19 +74,28 @@ export async function importHotspots(rawData: string) {
       const kec = cols[6];
       const sat = cols[7];
       const dateStr = cols[8]; // YYYY-MM-DD
+      const timeStr = cols[9] || "00:00:00"; // HH:MM:SS
 
       // Filter hanya Kaltim (jaga-jaga admin copas semua Kalimantan)
       if (prov?.includes("TIMUR") && !isNaN(lat) && !isNaN(lng)) {
-        validData.push({
-          latitude: lat,
-          longitude: lng,
-          confidence: conf,
-          province: prov,
-          district: kab,
-          subDistrict: kec,
-          satellite: sat,
-          date: new Date(dateStr)
-        });
+
+        // PENTING: Pakai Offset +07:00 (WIB) agar jamnya akurat di Database
+        // Format: YYYY-MM-DDTHH:mm:ss+07:00
+        const isoString = `${dateStr}T${timeStr}${timeStr.length === 5 ? ':00' : ''}+07:00`;
+        const dateObj = new Date(isoString);
+
+        if (!isNaN(dateObj.getTime())) {
+          validData.push({
+            latitude: lat,
+            longitude: lng,
+            confidence: conf,
+            province: prov,
+            district: kab,
+            subDistrict: kec,
+            satellite: sat,
+            date: dateObj
+          });
+        }
       }
     }
 

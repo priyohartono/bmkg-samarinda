@@ -100,70 +100,40 @@ export default function HotspotMap({ data }: { data: HotspotData[] }) {
         ))}
       </MapContainer>
       
-      {/* --- INFO WINDOW --- */}
-      <div className="absolute top-4 right-4 z-[1000] w-72 transition-all duration-300 pointer-events-none">
+      {/* --- INFO WINDOW (Standardized) --- */}
+      <div className="absolute top-4 right-4 z-[1000] w-64 bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-white/50 transition-all duration-300">
+        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+             INFO TITIK PANAS
+        </h4>
+        
         {hoveredSpot && statusInfo ? (
-          <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-red-100 animate-in fade-in slide-in-from-top-2 duration-300 pointer-events-auto">
-            <div className="flex items-center gap-3 mb-3 border-b border-red-50 pb-3">
-               <div className="bg-red-50 p-2 rounded-lg relative overflow-hidden">
-                  <Flame className="w-5 h-5 text-red-600 relative z-10" />
-                  <div className="absolute inset-0 bg-red-200 animate-pulse opacity-50"></div>
-               </div>
-               <div>
-                  <h4 className="font-bold text-gray-900 leading-tight">Hotspot Terdeteksi</h4>
-                  <p className="text-[10px] text-gray-500 font-mono">ID: {hoveredSpot.id.slice(-6)}</p>
-               </div>
+          <div>
+            <div className="text-blue-900 font-bold leading-tight text-sm mb-2">
+                {hoveredSpot.subDistrict}
             </div>
+            
+            <div className="flex flex-col gap-2">
+               <div className="flex items-center justify-between text-xs bg-gray-50 p-2 rounded-lg border border-gray-100">
+                  <span className="text-gray-500">Confidence:</span>
+                  <span className={`font-bold px-2 py-0.5 rounded ${statusInfo.bg.replace("bg-", "text-").replace("50", "600")}`} style={{ backgroundColor: statusInfo.bg.replace("bg-", "#") === "bg-red-50" ? "#fee2e2" : (statusInfo.bg.includes("orange") ? "#ffedd5" : "#fef9c3") }}> 
+                    {/* Note: Tailwind bg classes in style might be tricky, using simple conditional class logic above or consistent style */}
+                     {statusInfo.label} ({hoveredSpot.conf})
+                  </span>
+               </div>
 
-            <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
-                    <div>
-                        <div className="text-xs text-gray-500 uppercase font-bold">Lokasi</div>
-                        <div className="text-sm font-bold text-gray-800">{hoveredSpot.subDistrict}</div>
-                        <div className="text-xs text-gray-600">{hoveredSpot.district}, Kaltim</div>
-                        <div className="text-[10px] text-gray-400 font-mono mt-0.5">
-                            {hoveredSpot.lat.toFixed(4)}, {hoveredSpot.lng.toFixed(4)}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-2">
-                    <div className="bg-gray-50 p-2 rounded-lg">
-                        <div className="flex items-center gap-1 text-[10px] text-gray-500 mb-1">
-                            <Satellite className="w-3 h-3" /> Satelit
-                        </div>
-                        <div className="font-bold text-sm text-gray-800">{hoveredSpot.satellite}</div>
-                    </div>
-                    {/* Status Box */}
-                    <div className={`${statusInfo.bg} p-2 rounded-lg`}>
-                        <div className="flex items-center gap-1 text-[10px] text-gray-500 mb-1">
-                            <AlertTriangle className="w-3 h-3" /> Confidence
-                        </div>
-                        <div className={`font-bold text-sm ${statusInfo.color}`}>
-                            {statusInfo.label} ({hoveredSpot.conf})
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full w-fit mt-1">
-                    <Calendar className="w-3 h-3" />
-                    {hoveredSpot.date}
-                </div>
+               <div className="flex items-center justify-between text-xs bg-gray-50 p-2 rounded-lg border border-gray-100">
+                  <span className="text-gray-500">Satelit:</span>
+                  <span className="font-medium text-gray-700">{hoveredSpot.satellite}</span>
+               </div>
+               
+               <div className="text-[10px] text-center text-gray-400 mt-1">
+                  {hoveredSpot.date}
+               </div>
             </div>
           </div>
         ) : (
-          <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-gray-200 pointer-events-auto">
-             <div className="flex items-center gap-3">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                </span>
-                <div>
-                    <div className="text-xs font-bold text-gray-600 uppercase tracking-wide">Live Monitoring</div>
-                    <div className="text-xs text-gray-500">Peta interaktif sebaran titik panas.</div>
-                </div>
-             </div>
+          <div className="text-gray-400 text-xs italic">
+            Arahkan kursor pada titik panas untuk melihat detail lokasi dan tingkat kepercayaan.
           </div>
         )}
       </div>

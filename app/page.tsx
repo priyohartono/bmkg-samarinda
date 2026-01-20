@@ -12,14 +12,6 @@ import AppPromo from "@/components/AppPromo";
 import NewsBulletinSection from "@/components/NewsBulletinSection";
 import FlyerSection from "@/components/FlyerSection"; // <--- Import
 
-// Helper Format Tanggal (Bisa dipindah ke utils jika mau, tapi dibiarkan disini tidak apa-apa)
-const formatDate = (date: Date) => {
-  return new Date(date).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-};
 
 export const revalidate = 30; 
 

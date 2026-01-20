@@ -33,7 +33,7 @@ export default async function KarhutlaPage() {
             </p>
             <div className="mt-3 inline-flex items-center gap-2 bg-white px-3 py-1 rounded-lg border border-red-100 text-xs font-bold text-red-600">
                 <Info className="w-3 h-3" />
-                Terdeteksi Hari Ini: {hotspots.length} Titik Panas
+                Terdeteksi 24 Jam Terakhir: {hotspots.length} Titik Panas
             </div>
         </div>
       </section>

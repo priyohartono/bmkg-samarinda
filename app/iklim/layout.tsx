@@ -4,7 +4,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 export default function IklimLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50 pt-10 pb-20">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full md:w-[1400px] mx-auto px-0 sm:px-4 lg:px-6">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 border-b border-gray-200 pb-6">

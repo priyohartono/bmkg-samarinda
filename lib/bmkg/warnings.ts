@@ -22,7 +22,7 @@ export async function getPeringatanDiniKaltim(): Promise<string> {
     const xmlText = await res.text();
     const parser = new XMLParser({
       ignoreAttributes: true,
-      isArray: (name) => name === "item", 
+      isArray: (name) => name === "item",
     });
 
     const jsonObj = parser.parse(xmlText);
@@ -33,8 +33,8 @@ export async function getPeringatanDiniKaltim(): Promise<string> {
     }
 
     // Cari peringatan khusus Kaltim
-    const kaltimWarning = items.find((item) => 
-       item.title?.toLowerCase().includes("kalimantan timur")
+    const kaltimWarning = items.find((item) =>
+      item.title?.toLowerCase().includes("maluku")
     );
 
     if (!kaltimWarning) {
@@ -70,8 +70,8 @@ export async function getLinkPeringatanDiniKaltim(): Promise<string | null> {
     if (!items || items.length === 0) return null;
 
     // Cari item yang judulnya Kaltim
-    const kaltimItem = items.find((item) => 
-      item.title?.toLowerCase().includes("kalimantan timur")
+    const kaltimItem = items.find((item) =>
+      item.title?.toLowerCase().includes("maluku")
     );
 
     return kaltimItem ? kaltimItem.link : null;

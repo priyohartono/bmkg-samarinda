@@ -2,188 +2,242 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { AlertTriangle, CloudRain, Sun, Info } from "lucide-react";
-import { WarningLevel } from "@/components/component-iklim/PDIEMapClient"; // Import tipe data tadi
+import { 
+  CloudRain, 
+  Sun, 
+  FileText, 
+  Download, 
+  ChevronLeft, 
+  ChevronRight,
+  Info
+} from "lucide-react";
 
-// 1. Dynamic Import Peta (Agar tidak error SSR)
+// Import Server Action
+import { getPdieData } from "@/app/admin/peringatan-dini/actions"; 
+import { RegionData } from "@/components/component-iklim/PDIEMapClient";
+
+// --- DYNAMIC IMPORT PETA ---
 const ClimateMapClient = dynamic(() => import("@/components/component-iklim/PDIEMapClient"), { 
   ssr: false,
-  loading: () => <div className="w-full h-[500px] bg-slate-100 animate-pulse rounded-xl flex items-center justify-center text-slate-400">Memuat Peta...</div>
+  loading: () => (
+    <div className="w-full h-[500px] bg-slate-50 flex flex-col items-center justify-center gap-3 text-slate-400 animate-pulse rounded-xl border border-slate-100">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"/>
+        <span className="text-xs font-medium tracking-wide">Memuat Peta...</span>
+    </div>
+  )
 });
 
-// --- DATA DUMMY (Nanti ini dari Database via API) ---
-const DUMMY_RAIN_DATA = [
-  { id: "1", name: "Samarinda", level: "AWAS" as WarningLevel },
-  { id: "2", name: "Balikpapan", level: "SIAGA" as WarningLevel },
-  { id: "3", name: "Kutai Kartanegara", level: "WASPADA" as WarningLevel },
-  { id: "4", name: "Bontang", level: "AMAN" as WarningLevel },
-  { id: "5", name: "Kutai Timur", level: "AMAN" as WarningLevel },
-  // ... kabupaten lain
-];
+// Tipe Data Lokal
+interface DbRegion {
+    id: string;
+    name: string;
+    rainLevel: string;
+    droughtLevel: string;
+}
 
-const DUMMY_DROUGHT_DATA = [
-  { id: "1", name: "Samarinda", level: "AMAN" as WarningLevel },
-  { id: "2", name: "Balikpapan", level: "AMAN" as WarningLevel },
-  { id: "3", name: "Paser", level: "SIAGA" as WarningLevel },
-  { id: "4", name: "Penajam Paser Utara", level: "WASPADA" as WarningLevel },
-  // ... kabupaten lain
-];
+interface DbDocument {
+    id: string;
+    title: string;
+    date: string;
+    fileUrl: string;
+    fileSize: string | null;
+    type: string;
+}
 
+const DOCS_PER_PAGE = 5;
+
+// --- KOMPONEN PAGE UTAMA ---
 export default function PeringatanDiniPage() {
+  // STATE UI
   const [activeTab, setActiveTab] = useState<"HUJAN" | "KEKERINGAN">("HUJAN");
-  const [geoJson, setGeoJson] = useState(null);
+  const [docPage, setDocPage] = useState(1);
 
-  // 2. Fetch GeoJSON saat mount
+  // STATE DATA
+  const [isLoading, setIsLoading] = useState(true);
+  const [geoJson, setGeoJson] = useState(null);
+  const [dbRegions, setDbRegions] = useState<DbRegion[]>([]);
+  const [dbDocs, setDbDocs] = useState<DbDocument[]>([]);
+  const [periodeLabel, setPeriodeLabel] = useState("");
+
+  // FETCH DATA
   useEffect(() => {
-    // Pastikan Anda menaruh file 'kaltim-kabupaten.json' di folder public/maps/
-    fetch("/maps/Kabupaten-Kota.geojson")
-      .then(res => res.json())
-      .then(data => setGeoJson(data))
-      .catch(err => console.error("Gagal load peta", err));
+    async function fetchData() {
+        try {
+            const mapRes = await fetch("/maps/kabupaten-kota.geojson");
+            const mapData = await mapRes.json();
+            setGeoJson(mapData);
+
+            const dbData = await getPdieData();
+            // @ts-ignore 
+            setDbRegions(dbData.regions);
+            setPeriodeLabel(dbData.periodeLabel);
+            // @ts-ignore
+            setDbDocs(dbData.documents);
+
+        } catch (error) {
+            console.error("Gagal memuat data sistem:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    fetchData();
   }, []);
 
-  // Pilih data berdasarkan tab yang aktif
-  const currentData = activeTab === "HUJAN" ? DUMMY_RAIN_DATA : DUMMY_DROUGHT_DATA;
+  // DATA PROCESSING
+  const currentRegionData: RegionData[] = dbRegions.map(region => ({
+      id: region.id,
+      name: region.name,
+      level: (activeTab === "HUJAN" ? region.rainLevel : region.droughtLevel) as any
+  }));
 
-  // Statistik Ringkas
-  const countAwas = currentData.filter(x => x.level === "AWAS").length;
-  const countSiaga = currentData.filter(x => x.level === "SIAGA").length;
-  const countWaspada = currentData.filter(x => x.level === "WASPADA").length;
+  const filteredDocs = dbDocs.filter(doc => doc.type === activeTab);
+  
+  const totalDocPages = Math.ceil(filteredDocs.length / DOCS_PER_PAGE);
+  const currentDocs = filteredDocs.slice(
+    (docPage - 1) * DOCS_PER_PAGE,
+    docPage * DOCS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setDocPage(1);
+  }, [activeTab]);
+
+
+  // PAGINATION HANDLER
+  const handlePageChange = (newPage: number) => {
+    setDocPage(newPage);
+  }
+
+  // LOADING SCREEN - Content only
+  if (isLoading) {
+      return (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="w-8 h-8 border-[3px] border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <span className="text-sm text-slate-400">Memuat Data...</span>
+          </div>
+      );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="space-y-8">
         
-        {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Peringatan Dini Iklim</h1>
-          <p className="text-slate-500">
-            Monitor potensi cuaca ekstrem dan kekeringan di wilayah Kalimantan Timur.
-          </p>
-        </div>
-
-        {/* Tab Controls */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* --- 1. TITLE & INFO (Content Header) --- */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <div>
+                <h2 className="text-2xl font-bold text-gray-800">
+                    Peringatan Dini Iklim
+                </h2>
+                <p className="text-gray-500 text-sm mt-1">
+                    Periode Aktif: <span className="font-bold text-blue-600">{periodeLabel || "-"}</span>
+                </p>
+            </div>
             
-            {/* Tombol Switch */}
-            <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
+            {/* Simple Tab Switcher */}
+            <div className="bg-slate-100 p-1 rounded-lg inline-flex">
                 <button
                     onClick={() => setActiveTab("HUJAN")}
-                    className={`flex-1 md:flex-none flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
                         activeTab === "HUJAN" 
-                        ? "bg-white text-blue-700 shadow-sm" 
+                        ? "bg-white text-blue-600 shadow-sm" 
                         : "text-slate-500 hover:text-slate-700"
                     }`}
                 >
-                    <CloudRain className="w-4 h-4" />
                     Curah Hujan Tinggi
                 </button>
                 <button
                     onClick={() => setActiveTab("KEKERINGAN")}
-                    className={`flex-1 md:flex-none flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
                         activeTab === "KEKERINGAN" 
-                        ? "bg-white text-orange-600 shadow-sm" 
+                        ? "bg-white text-amber-600 shadow-sm" 
                         : "text-slate-500 hover:text-slate-700"
                     }`}
                 >
-                    <Sun className="w-4 h-4" />
-                    Kekeringan Meteorologis
+                    Kekeringan
                 </button>
             </div>
-
-            {/* Info Status Singkat */}
-            <div className="flex gap-4 text-xs font-semibold">
-                {countAwas > 0 && (
-                    <span className="flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 rounded-full">
-                        <AlertTriangle className="w-3.5 h-3.5" /> {countAwas} Awas
-                    </span>
-                )}
-                {countSiaga > 0 && (
-                     <span className="flex items-center gap-1.5 px-3 py-1 bg-orange-100 text-orange-700 rounded-full">
-                        <Info className="w-3.5 h-3.5" /> {countSiaga} Siaga
-                    </span>
-                )}
-                {countWaspada > 0 && (
-                     <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
-                        <Info className="w-3.5 h-3.5" /> {countWaspada} Waspada
-                    </span>
-                )}
-            </div>
         </div>
 
-        {/* Main Layout: Peta & Detail */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* --- 2. MAP AREA --- */}
+        <div className="relative w-full h-[500px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
+                {geoJson && (
+                <ClimateMapClient 
+                    geoJsonData={geoJson} 
+                    warningData={currentRegionData} 
+                    warningType={activeTab} 
+                />
+                )}
+
+                {/* Simplified Legend (Bottom Left) */}
+                <div className="absolute bottom-4 left-4 z-[400] bg-white/95 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-slate-100">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase mb-2">Legenda</h4>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span> 
+                            <span className="text-[10px] font-semibold text-slate-600">Aman</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-yellow-400"></span> 
+                            <span className="text-[10px] font-semibold text-slate-600">Waspada</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-orange-500"></span> 
+                            <span className="text-[10px] font-semibold text-slate-600">Siaga</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-red-600"></span> 
+                            <span className="text-[10px] font-semibold text-slate-600">Awas</span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        {/* --- 3. DOCUMENTS --- */}
+        <div className="pt-4">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-gray-400"/>
+                Dokumen Analisis
+            </h3>
             
-            {/* Kolom Kiri: PETA */}
-            <div className="lg:col-span-2 h-[500px] md:h-[600px] bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
-                {geoJson ? (
-                    <ClimateMapClient 
-                        geoJsonData={geoJson} 
-                        warningData={currentData} 
-                        warningType={activeTab} 
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-50">
-                        Memuat Data Geospasial...
-                    </div>
-                )}
-            </div>
+            {filteredDocs.length > 0 ? (
+                <div className="space-y-3">
+                    {currentDocs.map((doc) => (
+                        <div key={doc.id} className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-blue-200 transition-colors shadow-sm group">
+                            <div className="flex items-center gap-4">
+                                <div className={`p-2 rounded-lg ${doc.type === 'HUJAN' ? 'bg-blue-50 text-blue-500' : 'bg-amber-50 text-amber-500'}`}>
+                                    <FileText className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-700 group-hover:text-blue-600">{doc.title}</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">{doc.date} • {doc.fileSize || "PDF"}</p>
+                                </div>
+                            </div>
+                            <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                <Download className="w-4 h-4" />
+                            </a>
+                        </div>
+                    ))}
 
-            {/* Kolom Kanan: DETAIL TEKS / DAFTAR */}
-            <div className="space-y-6">
-                
-                {/* Penjelasan Peringatan */}
-                <div className="bg-blue-50 border border-blue-100 p-5 rounded-xl">
-                    <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
-                        {activeTab === "HUJAN" ? <CloudRain className="w-5 h-5"/> : <Sun className="w-5 h-5"/>}
-                        Tentang Peringatan Ini
-                    </h3>
-                    <p className="text-sm text-blue-800 leading-relaxed">
-                        {activeTab === "HUJAN" 
-                            ? "Peringatan potensi curah hujan lebat yang dapat mengakibatkan bencana hidrometeorologi seperti banjir dan tanah longsor."
-                            : "Peringatan potensi berkurangnya curah hujan yang dapat memicu kekeringan lahan, kekurangan air bersih, dan peningkatan potensi karhutla."
-                        }
-                    </p>
+                    {/* Simple Pagination */}
+                    {totalDocPages > 1 && (
+                        <div className="flex justify-center mt-4 gap-2">
+                            <button onClick={() => handlePageChange(docPage - 1)} disabled={docPage === 1} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30">
+                                <ChevronLeft className="w-5 h-5 text-gray-500" />
+                            </button>
+                            <span className="text-xs font-medium text-gray-400 py-1">Halaman {docPage}</span>
+                            <button onClick={() => handlePageChange(docPage + 1)} disabled={docPage === totalDocPages} className="p-1 rounded hover:bg-gray-100 disabled:opacity-30">
+                                <ChevronRight className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+                    )}
                 </div>
-
-                {/* Daftar Wilayah Terdampak (Hanya yang ada warning) */}
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100 bg-slate-50 font-bold text-slate-700">
-                        Wilayah Terdampak
-                    </div>
-                    <ul className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
-                        {currentData
-                            .filter(d => d.level !== "AMAN")
-                            .sort((a, b) => {
-                                const order = { "AWAS": 1, "SIAGA": 2, "WASPADA": 3, "AMAN": 4 };
-                                return order[a.level] - order[b.level];
-                            })
-                            .map((item) => (
-                            <li key={item.id} className="p-4 flex justify-between items-center hover:bg-slate-50">
-                                <span className="font-medium text-slate-800">{item.name}</span>
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${
-                                    item.level === "AWAS" ? "bg-red-100 text-red-700" :
-                                    item.level === "SIAGA" ? "bg-orange-100 text-orange-700" :
-                                    "bg-yellow-100 text-yellow-700"
-                                }`}>
-                                    {item.level}
-                                </span>
-                            </li>
-                        ))}
-                        
-                        {currentData.filter(d => d.level !== "AMAN").length === 0 && (
-                            <li className="p-8 text-center text-slate-400 text-sm">
-                                Tidak ada peringatan dini aktif di seluruh wilayah saat ini.
-                            </li>
-                        )}
-                    </ul>
+            ) : (
+                <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                    <p className="text-sm text-gray-400">Tidak ada dokumen tersedia.</p>
                 </div>
-
-            </div>
-
+            )}
         </div>
 
-      </div>
     </div>
   );
 }

@@ -140,3 +140,42 @@ model Flyer {
 
   @@map("flyers")
 }
+
+// ------------------------------------
+// Tabel 8: PDIE - Data Wilayah & Status
+// ------------------------------------
+model PdieRegion {
+  id           String   @id @default(cuid())
+  name         String   @unique // Nama kota harus unik
+  rainLevel    String   @default("AMAN") @map("rain_level")     // 'AMAN', 'WASPADA', 'SIAGA', 'AWAS'
+  droughtLevel String   @default("AMAN") @map("drought_level")  // 'AMAN', 'WASPADA', 'SIAGA', 'AWAS'
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("pdie_regions")
+}
+
+// ------------------------------------
+// Tabel 9: PDIE - Metadata (Label Periode)
+// ------------------------------------
+model PdieMeta {
+  key   String @id // Primary key, misal: "periode_label"
+  value String     // Isi label, misal: "Dasarian I Januari 2026"
+
+  @@map("pdie_meta")
+}
+
+// ------------------------------------
+// Tabel 10: PDIE - Dokumen Laporan
+// ------------------------------------
+model PdieDocument {
+  id        String   @id @default(cuid())
+  title     String
+  fileUrl   String   @map("file_url")   // URL Public untuk download
+  filePath  String   @map("file_path")  // Path di Supabase Storage (untuk hapus)
+  fileSize  String?  @map("file_size")  // Info ukuran file (e.g. "1.2 MB")
+  type      String   // 'HUJAN' atau 'KEKERINGAN'
+  date      String   // Disimpan string agar format fleksibel sesuai input admin
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("pdie_documents")
+}

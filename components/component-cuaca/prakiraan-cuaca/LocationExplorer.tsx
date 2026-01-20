@@ -6,7 +6,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { getRegencies, getDistricts, getVillages } from "@/lib/wilayah-utils";
 import { searchCoordinates } from "@/lib/geocoding-utils";
-import { MapPin, ChevronRight, Navigation, Layers, Search, MapPinned } from "lucide-react";
+import { MapPin, ChevronRight, Navigation, Layers, Search } from "lucide-react";
 
 // --- TIPE DATA ---
 interface Wilayah {
@@ -163,7 +163,7 @@ export default function LocationExplorer({ onLocationSelect }: Props) {
   };
 
   return (
-    <div className="relative w-full md:w-[1000px] h-[500px] md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-xl border border-slate-200 bg-slate-100 group">
+    <div className="relative w-full h-[500px] md:h-[600px] rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-slate-100 group">
       
       {/* LAYER 1: PETA (BACKGROUND) */}
       <div className="absolute inset-0 z-0">
@@ -171,7 +171,8 @@ export default function LocationExplorer({ onLocationSelect }: Props) {
             center={defaultCenter} 
             zoom={8} 
             style={{ height: "100%", width: "100%" }} 
-            zoomControl={false}
+            zoomControl={true}
+            scrollWheelZoom={false}
         >
             <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" attribution='&copy; CARTO' />
             
@@ -187,8 +188,8 @@ export default function LocationExplorer({ onLocationSelect }: Props) {
       </div>
 
       {/* LAYER 2: PANEL FILTER (FLOATING) */}
-      <div className="absolute top-4 left-4 right-4 z-[1000] flex justify-center">
-        <div className="bg-white/90 backdrop-blur-md p-4 rounded-[2rem] shadow-lg border border-white/50 w-full max-w-4xl transition-all hover:bg-white">
+      <div className="absolute top-4 left-0 right-0 z-[1000] flex justify-center">
+        <div className="bg-white/90 backdrop-blur-md p-4 rounded-xl shadow-lg border border-white/50 w-full max-w-4xl transition-all hover:bg-white">
             
             {/* Header Panel */}
             <div className="flex items-center justify-between mb-3 px-2">

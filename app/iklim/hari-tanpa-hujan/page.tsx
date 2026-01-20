@@ -46,7 +46,7 @@ export default async function HTHPage() {
                 <CloudRain className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-lg font-bold text-gray-800">Belum Ada Data</h3>
-            <p className="text-gray-500 max-w-md mt-1">
+            <p className="text-gray-500 mt-1">
                 Data monitoring Hari Tanpa Hujan belum tersedia di database.
             </p>
         </div>

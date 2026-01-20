@@ -150,7 +150,7 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
                             {/* 1. Boundary */}
                             <div className="p-2">
                                 <button onClick={() => setShowBoundary(!showBoundary)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showBoundary ? 'bg-slate-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
-                                    <div className="flex items-center gap-3"><MapIcon className="w-4 h-4" /><span className="text-xs font-medium">Regions (FIR)</span></div>
+                                    <div className="flex items-center gap-3"><MapIcon className="w-4 h-4" /><span className="text-xs font-medium">Regions</span></div>
                                     {showBoundary ? <Eye className="w-3.5 h-3.5 text-emerald-400" /> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
                             </div>
@@ -159,7 +159,7 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
                             <div className="p-2">
                                 <button onClick={() => setShowSigmet(!showSigmet)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showSigmet ? 'bg-red-900/30 text-red-200 border border-red-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
                                     <div className="flex items-center gap-3"><AlertTriangle className="w-4 h-4" /><span className="text-xs font-medium">SIGMET Hazards</span></div>
-                                    {showSigmet ? <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
+                                    {showSigmet ? <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
 
                                 {/* --- TAMBAHKAN LEGEND SIGMET DI SINI --- */}
@@ -173,7 +173,7 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
                             {/* 3. RADAR (INDEPENDENT) */}
                             <div className="p-2">
                                 <button onClick={() => setShowRadar(!showRadar)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showRadar ? 'bg-blue-900/30 text-blue-200 border border-blue-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
-                                    <div className="flex items-center gap-3"><Layers className="w-4 h-4" /><span className="text-xs font-medium">Rain Radar</span></div>
+                                    <div className="flex items-center gap-3"><Layers className="w-4 h-4" /><span className="text-xs font-medium">Radar</span></div>
                                     {showRadar ? <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
                                 
@@ -189,7 +189,7 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
                             <div className="p-2">
                                 <button onClick={() => setShowSatellite(!showSatellite)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showSatellite ? 'bg-purple-900/30 text-purple-200 border border-purple-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
                                     <div className="flex items-center gap-3"><Globe className="w-4 h-4" /><span className="text-xs font-medium">Himawari-9</span></div>
-                                    {showSatellite ? <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
+                                    {showSatellite ? <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
 
                                 {/* LEGEND SATELLITE (INSIDE PANEL) */}

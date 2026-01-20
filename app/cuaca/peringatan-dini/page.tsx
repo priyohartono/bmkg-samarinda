@@ -24,14 +24,6 @@ export default async function PeringatanPage() {
 
   return (
       <div className=" min-h-screen w-full mx-auto space-y-6">
-        
-        {/* HEADER */}
-        <div className="border-b text-center border-gray-200 pb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Peringatan Dini Cuaca</h1>
-          <div className="bg-blue-50 border border-blue-300 p-4 rounded-xl flex gap-3 items-start">
-            <p className="text-gray-500">Peringatan dini cuaca untuk wilayah Provinsi Kalimantan Timur dalam tampilan peta interaktif. Data diambil dari Nowcasting BMKG</p>
-          </div>
-        </div>
 
         {/* KONDISI 1: AMAN */}
         {!alertData && (
@@ -68,7 +60,13 @@ export default async function PeringatanPage() {
 
                     {/* MAP VISUALIZATION */}
                     <div className="mb-8 relative z-0">
-                        <MapLoader data={{ polygons: alertData.polygons, severity: alertData.severity }} />
+                        <MapLoader data={{ 
+                            polygons: alertData.polygons, 
+                            severity: alertData.severity,
+                            event: alertData.event,
+                            headline: alertData.headline,
+                            areaDesc: alertData.areaDesc
+                        }} />
                         <p className="text-center text-xs text-gray-400 mt-2">
                             *Area berwarna adalah wilayah terdampak langsung berdasarkan data radar/satelit
                         </p>

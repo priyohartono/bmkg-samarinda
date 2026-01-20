@@ -2,7 +2,7 @@
 
 import { BMKGResponse } from "./types";
 import { 
-    Wind, Droplets, MapPin, Navigation, 
+    Wind, Droplets, MapPin, Navigation2, 
     Clock, Eye, CalendarDays 
 } from "lucide-react";
 import { 
@@ -104,7 +104,7 @@ const CustomWindArrow = (props: any) => {
         <g transform={`translate(${x + width / 2},${y - 25})`}> 
             {/* y - 20 artinya geser 20px ke atas dari puncak batang */}
             <foreignObject x={-10} y={0} width={20} height={20}>
-                <Navigation 
+                <Navigation2 
                     width={20} 
                     height={20} 
                     color="#0d9488" // Warna disamakan dengan batang angin
@@ -281,7 +281,7 @@ export default function WeatherSummary({ data }: Props) {
                             </div>
                             
                             <div className="inline-flex items-center gap-1 px-2 py-1 md:px-3 md:py-1.5 bg-slate-50 rounded-full text-[10px] md:text-xs font-semibold text-slate-600 w-full justify-center">
-                                <Navigation className="w-2.5 h-2.5 md:w-3 md:h-3" style={{ transform: `rotate(${getWindRotation(current.wd)}deg)` }} />
+                                <Navigation2 className="w-2.5 h-2.5 md:w-3 md:h-3" style={{ transform: `rotate(${getWindRotation(current.wd)}deg)` }} />
                                 <span className="truncate">Arah: {current.wd}</span>
                             </div>
                         </div>

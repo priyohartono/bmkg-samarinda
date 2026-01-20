@@ -124,7 +124,7 @@ export default function FlyerSection({ flyers }: FlyerSectionProps) {
             {flyers.map((item, index) => (
                 <div 
                     key={item.id} 
-                    className="flex-shrink-0 w-full relative aspect-[4/1] md:aspect-[5/1] bg-slate-100 snap-center cursor-pointer overflow-hidden"
+                    className="flex-shrink-0 w-full relative aspect-[4/1] md:aspect-[5/1.2] bg-slate-100 snap-center cursor-pointer overflow-hidden"
                     onClick={() => item.link && window.open(item.link, '_blank')}
                 >
                     <div className="relative w-full h-full">

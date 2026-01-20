@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Download, FileText, ChevronRight, ArrowRight, BookOpen } from "lucide-react";
+import { Calendar, Download, ChevronRight, ArrowRight, BookOpen } from "lucide-react";
 
 interface Post {
   id: string;
