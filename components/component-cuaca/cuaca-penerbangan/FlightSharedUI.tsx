@@ -1,8 +1,8 @@
 // components/component-cuaca/cuaca-penerbangan/FlightSharedUI.tsx
-import { ParsedMetar, getPublicSummary } from "@/lib/bmkg/aviation-utils";
-import { Thermometer } from "lucide-react";
+import { ParsedMetar, getPublicSummary, getVisibilityStatus } from "@/lib/bmkg/aviation-utils";
+import { Thermometer, Eye } from "lucide-react";
 
-// 1. Metric Item (Kotak Kecil)
+// 1. Metric Item (Kotak Kecil) - TIDAK ADA PERUBAHAN
 export function TicketMetricItem({ icon, label, value, sub, mini = false }: any) {
     return (
         <div className={`bg-white rounded-xl border border-slate-200 shadow-sm flex ${mini ? 'flex-row items-center gap-3 p-2' : 'flex-col gap-2 p-4'} relative overflow-hidden group hover:border-blue-300 transition-all`}>
@@ -21,7 +21,7 @@ export function TicketMetricItem({ icon, label, value, sub, mini = false }: any)
     )
 }
 
-// 2. Raw Data Block (METAR/TAF Text)
+// 2. Raw Data Block (METAR/TAF Text) - TIDAK ADA PERUBAHAN
 export function RawDataBlock({ title, data, colorClass, bgClass, borderClass, isTaf = false }: any) {
     return (
         <div className={`rounded-2xl p-4 border ${bgClass} ${borderClass}`}>
@@ -44,32 +44,57 @@ export function RawDataBlock({ title, data, colorClass, bgClass, borderClass, is
     )
 }
 
-// 3. Small Airport Card (Kartu Grid)
+// 3. Small Airport Card (Kartu Grid) - DIPERBARUI
 export function SmallAirportCard({ airport }: { airport: ParsedMetar }) {
-    const { status, humanWeather } = getPublicSummary(airport.visibility, airport.weather);
+    // 1. Dapatkan status umum (icon, cuaca manusia)
+    const { humanWeather } = getPublicSummary(airport.visibility, airport.weather);
     const iconUrl = `https://web-aviation.bmkg.go.id/images/weathers/${airport.symbol}.png`;
 
+    // 2. Dapatkan status visibilitas detail menggunakan helper baru
+    const visStatus = getVisibilityStatus(airport.visibility);
+
     return (
-        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all hover:border-blue-300 group h-full cursor-pointer">
+        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all hover:border-blue-300 group h-full cursor-pointer flex flex-col justify-between">
+            {/* Header: Nama Bandara & Status Dot */}
             <div className="flex justify-between items-start mb-3">
                 <div>
-                    <h4 className="font-bold text-gray-800 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                    <h4 className="font-bold text-gray-800 line-clamp-1 group-hover:text-blue-600 transition-colors text-sm">
                         {airport.station_name.split(' - ')[0]}
                     </h4>
-                    <span className="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">{airport.icao_id}</span>
+                    <span className="text-[10px] font-mono font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors mt-1 inline-block">
+                        {airport.icao_id}
+                    </span>
                 </div>
-                <div className={`w-2.5 h-2.5 rounded-full ${status.color.split(' ')[0].replace('bg-', 'bg-').replace('-100', '-500')}`}></div>
+                {/* Dot Status Visibilitas di pojok kanan atas */}
+                <div className={`w-2.5 h-2.5 rounded-full ${visStatus.dot} ring-2 ring-white shadow-sm`}></div>
             </div>
-            <div className="text-sm text-gray-600 flex items-center gap-3">
-                <div className="w-8 h-8 shrink-0">
+
+            {/* Content: Cuaca & Suhu */}
+            <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 shrink-0 bg-slate-50 rounded-lg p-1 border border-slate-100">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={iconUrl} alt="icon" className="w-full h-full object-contain" />
                 </div>
-                <div>
-                    <div className="font-medium text-gray-800 leading-tight line-clamp-1">{humanWeather}</div>
-                    <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                        <Thermometer className="w-3 h-3"/> {airport.temp}°C
+                <div className="min-w-0">
+                    <div className="font-bold text-gray-800 text-sm leading-tight line-clamp-1 capitalize">
+                        {humanWeather}
                     </div>
+                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                        <span className="flex items-center gap-0.5 font-medium bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
+                            <Thermometer className="w-3 h-3 text-red-400"/> {airport.temp}°C
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Footer: Badge Status Visibilitas (Full Width) */}
+            <div className={`mt-auto pt-3 border-t border-dashed border-gray-100`}>
+                <div className={`flex items-center justify-between px-2 py-1.5 rounded-md text-xs font-bold border ${visStatus.className}`}>
+                    <span className="flex items-center gap-1.5">
+                        <Eye className="w-3.5 h-3.5 opacity-70"/>
+                        Visibilitas
+                    </span>
+                    <span>{visStatus.label.split(' ')[0]}</span> 
                 </div>
             </div>
         </div>

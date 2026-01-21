@@ -19,14 +19,16 @@ export interface HotspotData {
 
 export async function getHotspots() {
   try {
-    // 1. Tentukan rentang waktu "24 Jam Terakhir"
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    // 1. Tentukan rentang waktu "Berlaku Hari Ini" (Termasuk data kemarin)
+    const filterDate = new Date();
+    filterDate.setDate(filterDate.getDate() - 1); // Mundur 1 hari
+    filterDate.setHours(0, 0, 0, 0); // Mulai dari jam 00:00 kemarin
 
     const data = await prisma.hotspot.findMany({
       where: {
-        // FILTER: Data valid 24 jam terakhir
+        // FILTER: Data sejak kemarin jam 00:00
         date: {
-          gte: oneDayAgo
+          gte: filterDate
         }
       },
       orderBy: { date: 'desc' },

@@ -7,7 +7,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { ParsedMetar } from "@/lib/bmkg/aviation-utils";
 import { 
   Layers, Globe, Loader2, 
-  Map as MapIcon, AlertTriangle, Eye, EyeOff, ChevronsRight, Settings2,
+  Map as MapIcon, AlertTriangle, EyeOff, ChevronsRight, Settings2,
 } from "lucide-react";
 
 import { 
@@ -133,7 +133,6 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
                 .custom-leaflet-tooltip { border: none; border-radius: 8px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); padding: 12px; min-width: 250px; }
             `}</style>
 
-            {/* --- (REMOVED) CONTAINER: LEGENDS KIRI ATAS SUDAH DIHAPUS --- */}
 
             {/* --- RIGHT PANEL (LAYERS) --- */}
             <div className="absolute top-4 right-4 z-[1000] flex flex-col items-end gap-2 font-sans transition-all duration-300">
@@ -149,20 +148,20 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
                         <div className="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700">
                             {/* 1. Boundary */}
                             <div className="p-2">
-                                <button onClick={() => setShowBoundary(!showBoundary)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showBoundary ? 'bg-slate-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}>
+                                <button onClick={() => setShowBoundary(!showBoundary)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showBoundary ? 'bg-blue-900/30 text-blue-200 border border-blue-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
                                     <div className="flex items-center gap-3"><MapIcon className="w-4 h-4" /><span className="text-xs font-medium">Regions</span></div>
-                                    {showBoundary ? <Eye className="w-3.5 h-3.5 text-emerald-400" /> : <EyeOff className="w-3.5 h-3.5" />}
+                                    {showBoundary ? <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
                             </div>
                             
                             {/* 2. SIGMET */}
                             <div className="p-2">
-                                <button onClick={() => setShowSigmet(!showSigmet)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showSigmet ? 'bg-red-900/30 text-red-200 border border-red-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
+                                <button onClick={() => setShowSigmet(!showSigmet)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showSigmet ? 'bg-blue-900/30 text-blue-200 border border-blue-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
                                     <div className="flex items-center gap-3"><AlertTriangle className="w-4 h-4" /><span className="text-xs font-medium">SIGMET Hazards</span></div>
                                     {showSigmet ? <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
 
-                                {/* --- TAMBAHKAN LEGEND SIGMET DI SINI --- */}
+                                {/* --- LEGEND SIGMET  --- */}
                                 {showSigmet && (
                                     <div className="mt-1 pl-1">
                                         <SigmetLegend className="w-full bg-slate-800/50 border border-slate-700/50 animate-in slide-in-from-top-2" />
@@ -187,7 +186,7 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
 
                             {/* 4. SATELLITE (INDEPENDENT) */}
                             <div className="p-2">
-                                <button onClick={() => setShowSatellite(!showSatellite)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showSatellite ? 'bg-purple-900/30 text-purple-200 border border-purple-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
+                                <button onClick={() => setShowSatellite(!showSatellite)} className={`w-full flex items-center justify-between p-2 rounded-lg transition-all ${showSatellite ? 'bg-blue-900/30 text-blue-200 border border-blue-900/50' : 'text-slate-400 hover:bg-slate-800 border border-transparent'}`}>
                                     <div className="flex items-center gap-3"><Globe className="w-4 h-4" /><span className="text-xs font-medium">Himawari-9</span></div>
                                     {showSatellite ? <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div> : <EyeOff className="w-3.5 h-3.5" />}
                                 </button>
@@ -212,10 +211,6 @@ export default function AviationMap({ airports, onSelect, selectedIcao }: MapPro
             {(showRadar || showSatellite) && (
                 <div className="absolute bottom-8 left-4 right-4 z-[1000] pointer-events-none flex flex-col justify-end items-center">
                     
-                    {/* LOGIC LAYOUT:
-                        - Jika keduanya aktif: 'grid grid-cols-2 gap-4 w-full max-w-5xl' (Kiri & Kanan)
-                        - Jika satu aktif: 'w-full max-w-[500px]' (Tengah)
-                    */}
                     <div className={`
                         pointer-events-auto transition-all duration-300
                         ${(showRadar && showSatellite) 

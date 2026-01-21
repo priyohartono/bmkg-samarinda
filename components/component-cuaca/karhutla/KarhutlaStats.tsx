@@ -8,7 +8,7 @@ interface StatProps {
 
 export default function KarhutlaStats({ trend }: StatProps) {
   // Cari nilai max untuk skala grafik
-  const maxVal = Math.max(...trend.map(t => t.count), 10); // Min scale 10 biar ga gepeng kalau 0
+  const maxVal = Math.max(...trend.map(t => t.count), 1); // Min scale 1 agar bisa bagi
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -30,11 +30,12 @@ export default function KarhutlaStats({ trend }: StatProps) {
             {trend.map((item, idx) => {
                 // Format Tanggal (cth: 22 Des)
                 const dateLabel = new Date(item.date).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' });
-                // Tinggi Bar (%)
-                const heightPct = (item.count / maxVal) * 100;
+                // Tinggi Bar (Pixel calculation for stability)
+                const MAX_BAR_HEIGHT = 100; // px (Available space inside h-40 minus labels)
+                const barHeight = (item.count / maxVal) * MAX_BAR_HEIGHT;
                 
                 return (
-                    <div key={idx} className="flex flex-col items-center gap-2 flex-1 group">
+                    <div key={idx} className="flex flex-col items-center gap-2 flex-1 group h-full justify-end">
                         {/* Tooltip Count */}
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold text-blue-600 mb-1">
                             {item.count}
@@ -42,7 +43,7 @@ export default function KarhutlaStats({ trend }: StatProps) {
                         {/* The Bar */}
                         <div 
                             className={`w-full max-w-[40px] rounded-t-lg transition-all duration-500 relative ${item.count > 0 ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-100'}`}
-                            style={{ height: `${heightPct}%`, minHeight: '4px' }}
+                            style={{ height: `${barHeight}px`, minHeight: '4px' }}
                         >
                         </div>
                         {/* Date Label */}

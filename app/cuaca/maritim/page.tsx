@@ -112,43 +112,41 @@ export default function MaritimePage() {
     <div className="min-h-screen ">
       <div className="max-w-6xl mx-auto space-y-8 max-sm:max-w-xs ">
         
-        {/* --- HEADER --- */}
-        <div className="space-y-6 border-b border-gray-200 pb-8">
-
-            {/* Toggle Switch (Centered) */}
-            <div className="flex justify-center">
-                <div className="bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm flex w-full md:w-auto">
-                    <button 
-                        onClick={() => toggleMode('area')}
-                        className={`flex-1 md:flex-none px-8 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${viewMode === 'area' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
-                    >
-                        <Waves className="w-4 h-4" /> Perairan
-                    </button>
-                    <button 
-                        onClick={() => toggleMode('port')}
-                        className={`flex-1 md:flex-none px-8 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${viewMode === 'port' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
-                    >
-                        <Anchor className="w-4 h-4" /> Pelabuhan
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        {/* --- DATE SELECTOR (ADAPTIF) --- */}
-        <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap gap-2 overflow-x-auto">
-            {availableDays.map((label, idx) => (
-                <button
-                    key={idx}
-                    onClick={() => setSelectedDayIndex(idx)}
-                    className={`flex-1 min-w-[100px] px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-                        selectedDayIndex === idx 
-                        ? 'bg-blue-600 text-white shadow-md shadow-blue-200 ring-2 ring-blue-600 ring-offset-2' 
-                        : 'bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600'
-                    }`}
+        {/* --- UNIFIED CONTROL BAR (NEW DESIGN) --- */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-2 flex flex-col lg:flex-row items-center justify-between gap-4 sticky top-4 z-40 backdrop-blur-md bg-white/90">
+            
+            {/* 1. Mode Switcher (Kiri) */}
+            <div className="bg-gray-100 p-1.5 rounded-2xl flex w-full lg:w-auto">
+                <button 
+                    onClick={() => toggleMode('area')}
+                    className={`flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 ${viewMode === 'area' ? 'bg-white text-blue-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                    <CalendarDays className="w-4 h-4" /> {label}
+                    <Waves className="w-4 h-4" /> Perairan
                 </button>
-            ))}
+                <button 
+                    onClick={() => toggleMode('port')}
+                    className={`flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 ${viewMode === 'port' ? 'bg-white text-blue-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    <Anchor className="w-4 h-4" /> Pelabuhan
+                </button>
+            </div>
+
+            {/* 2. Date Selector (Kanan) - Scrollable Pill List */}
+            <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 scrollbar-hide">
+                {availableDays.map((label, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => setSelectedDayIndex(idx)}
+                        className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+                            selectedDayIndex === idx 
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-200' 
+                            : 'bg-white border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-200'
+                        }`}
+                    >
+                        {label}
+                    </button>
+                ))}
+            </div>
         </div>
 
         {/* --- MAP --- */}
