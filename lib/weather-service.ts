@@ -198,9 +198,16 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     };
   });
 
+  // ... kode sebelumnya di transformToUIData ...
+
   return {
     location: locationName,
-    parentLocation: level === 'province' ? 'Indonesia' : (rootMeta.provinsi || rootMeta.kotkab),
+    
+    // PERBAIKAN 1: Tambahkan '|| ""' agar tidak undefined
+    parentLocation: level === 'province' 
+      ? 'Indonesia' 
+      : (rootMeta.provinsi || rootMeta.kotkab || ""), 
+      
     level: level,
     timestamp: `Diperbarui: ${refWeather.local_datetime}`,
     
@@ -211,9 +218,7 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     windSpeed: windSpeedAvg,
     humidity: humidityAvg,
     tcc: tccAvg,
-    
     feelsLike: realFeelValue, 
-    
     visibility: parseFloat(refWeather.vs_text.replace('<', '').replace('km', '').trim()) || 10,
     uvIndex: 0,
     subRegions: subRegions,
@@ -235,7 +240,6 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     }))
   };
 };
-
 
 
 // --- FUNGSI BARU: AMBIL SATU PROVINSI SEKALIGUS ---

@@ -39,21 +39,43 @@ export interface WeatherData {
   parentLocation: string;
   level: RegionLevel;
   timestamp: string;
+  
   temp: number;
-  feelsLike: number;
+  tempRange?: string;
   condition: string;
   description: string;
   windSpeed: number;
   humidity: number;
-  pressure: number;
+  
+  // --- PASTIKAN INI TCC, BUKAN PRESSURE ---
+  tcc: number; 
+  // pressure: number; // (Hapus baris ini jika masih ada)
+  
+  feelsLike: number;
   visibility: number;
   uvIndex: number;
-  breadcrumbs: BreadcrumbItem[];
-  subRegions: SubRegionSummary[];
-  hourly: HourlyForecast[];
-  daily: DailyForecast[];
-  tableData?: GeneralForecastRow[];
-  tempRange?: string;
-  image: string;
-  tcc: number;
+  
+  subRegions: {
+    id: string;
+    name: string;
+    level: RegionLevel;
+    temp: number;
+    condition: string;
+    icon: string;
+  }[];
+
+  tableData: {
+    time: string;
+    date: string;
+    weatherIcon: string;
+    weatherDesc: string;
+    wind: {
+      direction: string;
+      deg: number;
+      speed: number;
+    };
+    temp: number;
+    feelsLike: number;
+    humidity: number;
+  }[];
 }

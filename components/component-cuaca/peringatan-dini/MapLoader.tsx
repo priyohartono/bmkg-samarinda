@@ -1,4 +1,4 @@
-"use client"; // <--- Wajib ada di sini
+"use client"; 
 
 import dynamic from "next/dynamic";
 import React from "react";
@@ -7,9 +7,9 @@ import React from "react";
 const WarningMap = dynamic(
   () => import("./WarningMap"), 
   {
-    ssr: false, // Sekarang valid karena berada di Client Component
+    ssr: false, 
     loading: () => (
-      <div className="h-[400px] w-full bg-gray-100 animate-pulse rounded-2xl flex items-center justify-center text-gray-400">
+      <div className="h-[400px] md:h-[600px] w-full bg-gray-100 animate-pulse rounded-2xl flex items-center justify-center text-gray-400">
         Memuat Peta...
       </div>
     )

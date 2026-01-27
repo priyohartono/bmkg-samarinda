@@ -57,7 +57,7 @@ export default function WarningMap({ data }: WarningMapProps) {
   } : null;
 
   return (
-    <div className="relative h-[500px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
+    <div className="relative h-[400px] md:h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
       
       {/* 1. MAP CONTAINER */}
       <MapContainer 
