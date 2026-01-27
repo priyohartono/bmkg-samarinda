@@ -14,7 +14,7 @@ const poppins = Poppins({
 // 2. METADATA LENGKAP (SEO & Social Media)
 export const metadata: Metadata = {
   // GANTI INI dengan domain asli Anda saat sudah deploy (misal: https://bmkg-samarinda.id)
-  metadataBase: new URL('http://localhost:3000'), 
+  metadataBase: new URL('http://bmkg-samarinda.vercel.app'), 
 
   title: {
     template: '%s | BMKG APT Pranoto Samarinda',
