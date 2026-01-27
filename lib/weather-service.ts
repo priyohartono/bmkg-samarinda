@@ -91,6 +91,7 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
   let dominantIcon = ""; 
   let windSpeedAvg = 0;
   let humidityAvg = 0;
+  let tccAvg = 0;
   
   // Data Referensi (Fallback)
   let referenceData = json.data[0];
@@ -108,6 +109,7 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     const iconUrls: string[] = []; 
     let totalWs = 0;
     let totalHu = 0;
+    let totalTcc = 0;
 
     json.data.forEach(item => {
       const w = getCurrentWeatherItem(item.cuaca);
@@ -117,6 +119,7 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
       iconUrls.push(w.image); 
       totalWs += w.ws;
       totalHu += w.hu;
+      totalTcc += w.tcc;
     });
 
     const minT = Math.min(...temps);
@@ -135,6 +138,7 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     
     windSpeedAvg = Math.round(totalWs / json.data.length);
     humidityAvg = Math.round(totalHu / json.data.length);
+    tccAvg = Math.round(totalTcc / json.data.length);
 
   } else {
     // --- LOGIKA SINGLE (KELURAHAN) ---
@@ -144,6 +148,7 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     dominantIcon = refWeather.image; 
     windSpeedAvg = refWeather.ws;
     humidityAvg = refWeather.hu;
+    tccAvg = refWeather.tcc;
   }
 
   // --- HITUNG REALFEEL MENGGUNAKAN HELPER BARU ---
@@ -170,9 +175,18 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     let id = item.lokasi.adm4 || item.lokasi.adm3 || item.lokasi.adm2 || "";
     let name = item.lokasi.desa || item.lokasi.kecamatan || item.lokasi.kotkab || "";
 
-    if (level === 'province') { id = item.lokasi.adm2; name = item.lokasi.kotkab || ""; }
-    else if (level === 'city') { id = item.lokasi.adm3!; name = item.lokasi.kecamatan || ""; }
-    else if (level === 'district') { id = item.lokasi.adm4!; name = item.lokasi.desa || ""; }
+    if (level === 'province') { 
+      id = item.lokasi.adm2 ?? ""; 
+      name = item.lokasi.kotkab ?? ""; 
+    }
+    else if (level === 'city') { 
+      id = item.lokasi.adm3 ?? ""; 
+      name = item.lokasi.kecamatan ?? ""; 
+    }
+    else if (level === 'district') { 
+      id = item.lokasi.adm4 ?? ""; 
+      name = item.lokasi.desa ?? ""; 
+    }
 
     return {
       id: id,
@@ -180,7 +194,6 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
       level: getLevel(id) as any,
       temp: w.t,
       condition: w.weather_desc,
-      // --- UBAH 6: Gunakan URL icon langsung ---
       icon: w.image, 
     };
   });
@@ -197,10 +210,10 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     description: descriptionText, 
     windSpeed: windSpeedAvg,
     humidity: humidityAvg,
+    tcc: tccAvg,
     
     feelsLike: realFeelValue, 
     
-    pressure: 1010,
     visibility: parseFloat(refWeather.vs_text.replace('<', '').replace('km', '').trim()) || 10,
     uvIndex: 0,
     subRegions: subRegions,
@@ -209,7 +222,6 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     tableData: referenceData.cuaca.flat().map((w: BMKGWeatherItem) => ({
       time: w.local_datetime.split(' ')[1].slice(0, 5),
       date: w.local_datetime.split(' ')[0],
-      // --- UBAH 7: Gunakan URL icon langsung ---
       weatherIcon: w.image, 
       weatherDesc: w.weather_desc,
       wind: {
@@ -222,4 +234,61 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
       humidity: w.hu
     }))
   };
+};
+
+
+
+// --- FUNGSI BARU: AMBIL SATU PROVINSI SEKALIGUS ---
+export const getKaltimWeather = async () => {
+  try {
+    const res = await fetch(
+      "https://cuaca.bmkg.go.id/api/df/v1/forecast/adm?adm1=64",
+      { next: { revalidate: 300 } }
+    );
+
+    if (!res.ok) throw new Error("Gagal mengambil data cuaca provinsi");
+
+    const responseData = await res.json();
+
+    // Pastikan properti 'data' ada dan merupakan array
+    if (!responseData.data || !Array.isArray(responseData.data)) {
+      return [];
+    }
+
+    // Transformasi Data
+    const formattedList = responseData.data.map((item: any) => {
+      // 1. Ambil Nama Wilayah (Kotkab)
+      const namaWilayah = item.lokasi.kotkab || "Wilayah";
+
+      // 2. Ambil data cuaca jam pertama dari array pertama
+      // Struktur API: item.cuaca[0][0] adalah data jam terdekat
+      const current = item.cuaca?.[0]?.[0];
+
+      if (!current) return null;
+
+      return {
+        wilayah: namaWilayah,
+        suhu: current.t,
+        cuaca: current.weather_desc,
+        kodeCuaca: String(current.weather),
+        iconUrl: current.image || "",
+        // Format jam dari local_datetime (contoh: "2026-01-27 15:00:00" -> "15:00")
+        jam: current.local_datetime 
+              ? current.local_datetime.split(' ')[1].substring(0, 5) 
+              : "Terkini",
+        anginSpeed: Math.round(current.ws * 1.852), // Jika API knot, kali 1.852 untuk km/jam
+        anginDir: current.wd, // Arah angin (N, SW, NE, dll)
+        kelembapan: current.hu
+      };
+    });
+
+    // Filter hasil yang null dan urutkan abjad berdasarkan nama wilayah
+    return formattedList
+      .filter((item: any) => item !== null)
+      .sort((a: any, b: any) => a.wilayah.localeCompare(b.wilayah));
+
+  } catch (error) {
+    console.error("Error fetching Kaltim weather:", error);
+    return [];
+  }
 };

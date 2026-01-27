@@ -9,12 +9,6 @@ import SubRegionGrid from '@/components/component-cuaca/prakiraan-cuaca/SubRegio
 import ForecastTable from '@/components/component-cuaca/prakiraan-cuaca/ForecastTable';
 import { fetchBMKGData } from '@/lib/weather-service';
 import { WeatherData } from '@/lib/types';
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Prakiraan Cuaca | BMKG Samarinda",
-  description: "Informasi prakiraan cuaca tingkat kota, kecamatan dan kelurahan di wilayah Kalimantan Timur.",
-};
 
 export default function Home() {
   // --- PERUBAHAN 1: Ganti ID default ke '64' (Kalimantan Timur) ---

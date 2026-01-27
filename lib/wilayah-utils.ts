@@ -54,7 +54,6 @@ export const getVillages = async (distId: string): Promise<Wilayah[]> => {
   return district.villages.map(vill => ({
     id: vill.id,
     name: vill.name,
-    // LOGIKA PINTAR: Jika 'code' diisi manual, pakai itu. Jika tidak, pakai 'id'.
     bmkgCode: vill.code ? vill.code : vill.id 
   }));
 };

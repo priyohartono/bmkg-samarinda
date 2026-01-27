@@ -16,7 +16,7 @@ export default async function GempaTerbaruPage() {
       {/* --- 1. HERO: GEMPA MUTAKHIR --- */}
       {autoGempa && (
         <section>
-          <div className="bg-gradient-to-br from-red-50 to-white border border-red-100 rounded-3xl p-5 md:p-8 flex flex-col lg:flex-row gap-8 items-center shadow-sm">
+          <div className="bg-gradient-to-br  border border-red-100 rounded-3xl p-5 md:p-8 flex flex-col lg:flex-row gap-8 items-center shadow-sm">
                 
                 {/* Peta Shakemap (Responsive Aspect Ratio) */}
                 <div className="w-full lg:w-1/3 relative aspect-square md:aspect-video lg:aspect-[3/4] rounded-2xl overflow-hidden border border-red-100 shadow-md group">

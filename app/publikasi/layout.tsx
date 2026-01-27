@@ -28,13 +28,6 @@ export default function PublikasiLayout({ children }: { children: React.ReactNod
                     Pusat informasi terkini meliputi Berita Kegiatan, Arsip Buletin, serta Artikel & Makalah Ilmiah.
                 </p>
             </div>
-
-            {/* Hiasan Kanan */}
-            <div className="hidden md:block text-right">
-                <span className="block text-xs text-gray-400 uppercase tracking-wider font-bold">Update Terakhir</span>
-                <span className="text-sm font-medium text-gray-700">Realtime</span>
-            </div>
-
         </div>
 
         {/* --- LAYOUT UTAMA --- */}

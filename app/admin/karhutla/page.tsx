@@ -25,15 +25,6 @@ export default function AdminKarhutlaPage() {
     setLoading(false);
   };
 
-  const handleClear = async () => {
-    if (confirm("Hapus SEMUA data hotspot di database?")) {
-        setLoading(true);
-        await clearHotspots();
-        setStatus({ success: true, msg: "Database hotspot berhasil dikosongkan." });
-        setLoading(false);
-    }
-  };
-
   return (
     <div className="p-6 space-y-6">
        <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
@@ -41,9 +32,6 @@ export default function AdminKarhutlaPage() {
           <h1 className="text-2xl font-bold text-gray-800">Input Data Hotspot</h1>
           <p className="text-gray-500 text-sm">Copy data dari Excel lalu Paste di sini.</p>
         </div>
-        <button onClick={handleClear} className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors">
-          <Trash2 className="w-4 h-4" /> Reset Database
-        </button>
       </div>
 
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { 
-  Ship, Wind, Waves, Navigation, AlertTriangle, CalendarDays, Anchor, 
+  Ship, Wind, Waves, Navigation, AlertTriangle, Anchor, 
   Eye, Thermometer, Droplets, ArrowRight,
   Sun, CloudSun, Cloud, CloudFog, Haze, CloudDrizzle, CloudRain, 
   CloudRainWind, CloudSunRain, CloudLightning, ArrowUp, ArrowDown
@@ -18,10 +18,6 @@ import {
 } from "@/lib/bmkg/maritim";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Cuaca Maritim | BMKG Samarinda",
-  description: "Informasi cuaca perairan dan pelabuhan untuk wilayah Kalimantan Timur.",
-};
 
 const MaritimeMap = dynamic(() => import("@/components/component-cuaca/cuaca-maritim/MaritimeMap"), {
   ssr: false,

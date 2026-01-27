@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </details>
 
             {/* 2. PDIE (Link Langsung) */}
-            <Link href="/admin/iklim/peringatan-dini" className="flex items-center gap-3 p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium">
+            <Link href="/admin/peringatan-dini" className="flex items-center gap-3 p-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium">
                 <CircleAlert className="w-5 h-5" /> PDIE
             </Link>
           </div>

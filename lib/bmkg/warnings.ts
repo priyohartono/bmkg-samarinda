@@ -34,7 +34,7 @@ export async function getPeringatanDiniKaltim(): Promise<string> {
 
     // Cari peringatan khusus Kaltim
     const kaltimWarning = items.find((item) =>
-      item.title?.toLowerCase().includes("maluku")
+      item.title?.toLowerCase().includes("kalimantan timur")
     );
 
     if (!kaltimWarning) {
@@ -71,7 +71,7 @@ export async function getLinkPeringatanDiniKaltim(): Promise<string | null> {
 
     // Cari item yang judulnya Kaltim
     const kaltimItem = items.find((item) =>
-      item.title?.toLowerCase().includes("maluku")
+      item.title?.toLowerCase().includes("kalimantan timur")
     );
 
     return kaltimItem ? kaltimItem.link : null;

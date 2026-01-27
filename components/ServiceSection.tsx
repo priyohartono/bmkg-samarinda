@@ -7,14 +7,14 @@ const services = [
     desc: "Permintaan data meteorologi untuk riset, konstruksi, dan klaim asuransi.",
     icon: <Database className="w-6 h-6 text-white" />,
     color: "bg-blue-600",
-    href: "/layanan/data", 
+    href: "/layanan", 
   },
   {
     title: "Monitoring Hujan",
     desc: "Pantauan intensitas dan sebaran hujan realtime dari Automatic Rain Gauge (ARG)",
     icon: <CloudRain className="w-6 h-6 text-white" />,
     color: "bg-sky-600", // Warna Langit/Hujan
-    href: "https://monitoringarg.bmkgaptpranoto.com/", // Link ke halaman detail (nanti bisa dibuat)
+    href: "https://monitoringarg.bmkgaptpranoto.com/",
     external: true, // Menandakan link eksternal
   },
   {

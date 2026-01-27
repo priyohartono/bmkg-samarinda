@@ -15,7 +15,7 @@ interface Post {
 interface Bulletin {
   id: string;
   title: string;
-  edition: string;
+  edition?: string;
   year: string;
   coverUrl: string | null;
   pdfUrl: string;

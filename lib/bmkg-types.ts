@@ -12,6 +12,7 @@ export interface BMKGLocation {
   lon: number;
   lat: number;
   timezone?: string;
+  
 }
 
 export interface BMKGWeatherItem {
@@ -29,6 +30,7 @@ export interface BMKGWeatherItem {
   vs_text: string; // Visibility Text (< 8 km)
   analysis_date: string;
   image: string;   // URL Icon BMKG
+  tcc: number
 }
 
 export interface BMKGDataRow {

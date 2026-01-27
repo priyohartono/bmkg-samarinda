@@ -1,26 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   CloudSun, Activity, Wind, Droplets, ArrowRight, MapPin, Calendar, Waves,
   Sun, Cloud, CloudRain, CloudLightning, CloudFog 
 } from "lucide-react";
-// Import Type yang sudah diperbaiki
 import type { GempaData } from "@/lib/bmkg/gempa";
 import type { CuacaData } from "@/lib/bmkg/cuaca";
 
 interface InfoWidgetProps {
   dataGempa: GempaData | null;
-  dataCuaca: CuacaData | null;
+  listCuaca: CuacaData[]; 
 }
 
-export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
+export default function InfoWidget({ dataGempa, listCuaca }: InfoWidgetProps) {
   const [activeTab, setActiveTab] = useState<"cuaca" | "gempa">("cuaca");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Fallback Icon jika gambar dari BMKG gagal load / null
+  useEffect(() => {
+    if (!listCuaca || listCuaca.length <= 1 || isPaused || activeTab !== "cuaca") return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % listCuaca.length);
+    }, 5000); 
+    return () => clearInterval(interval);
+  }, [listCuaca, isPaused, activeTab]);
+
+  const currentCuaca = listCuaca && listCuaca.length > 0 ? listCuaca[currentIndex] : null;
+
   const getFallbackIcon = (code: string, sizeClass: string = "w-20 h-20") => {
     const c = parseInt(code);
+    if (isNaN(c)) return <CloudSun className={`${sizeClass} text-yellow-500`} />;
     if (c === 0 || c === 1 || c === 2) return <Sun className={`${sizeClass} text-yellow-500`} />;
     if (c === 3 || c === 4) return <Cloud className={`${sizeClass} text-gray-400`} />;
     if (c >= 5 && c <= 45) return <CloudFog className={`${sizeClass} text-slate-400`} />;
@@ -31,7 +42,7 @@ export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-20 mb-12">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col md:flex-row">
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col md:flex-row min-h-[250px]">
         
         {/* --- TAB NAVIGASI --- */}
         <div className="md:w-1/4 bg-gray-50 border-b md:border-b-0 md:border-r border-gray-200 flex md:flex-col">
@@ -41,9 +52,8 @@ export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
                 activeTab === 'cuaca' ? 'bg-white text-blue-600 font-bold shadow-sm md:border-l-4 md:border-l-blue-600' : 'text-gray-500 hover:bg-gray-100'
             }`}
           >
-            {/* Icon Tab Kecil */}
-            {dataCuaca?.iconUrl ? (
-                 <img src={dataCuaca.iconUrl} alt="icon" className="w-8 h-8 object-contain" />
+            {currentCuaca?.iconUrl ? (
+                 <img src={currentCuaca.iconUrl} alt="icon" className="w-8 h-8 object-contain" />
             ) : <CloudSun className="w-6 h-6" />}
             <span>Cuaca</span>
           </button>
@@ -60,71 +70,105 @@ export default function InfoWidget({ dataGempa, dataCuaca }: InfoWidgetProps) {
         </div>
 
         {/* --- KONTEN TAB --- */}
-        <div className="flex-1 p-6 md:p-8 min-h-[200px] flex items-center">
+        <div 
+            className="flex-1 p-6 md:p-8 flex flex-col justify-center relative"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+        >
             
             {/* KONTEN CUACA */}
             {activeTab === "cuaca" && (
-                <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {dataCuaca ? (
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div className="flex items-center gap-x-8">
-                                {/* ICON UTAMA: Prioritas Gambar API, Fallback ke Lucide */}
-                                {dataCuaca.iconUrl ? (
-                                    <div className="w-24 h-24 relative">
-                                        <img 
-                                            src={dataCuaca.iconUrl} 
-                                            alt={dataCuaca.cuaca}
-                                            className="w-full h-full object-contain drop-shadow-md scale-125"
-                                        />
-                                    </div>
-                                ) : (
-                                    getFallbackIcon(dataCuaca.kodeCuaca)
-                                )}
+                // 1. HAPUS 'h-full' disini agar konten tidak dipaksa meregang
+                <div className="w-full flex flex-col"> 
+                    {currentCuaca ? (
+                        // 2. HAPUS 'flex-1' disini agar div ini tidak mendorong dots ke bawah
+                        <div key={currentCuaca.wilayah} className="animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                                <div className="flex items-center gap-x-8">
+                                    {/* ICON UTAMA */}
+                                    {currentCuaca.iconUrl ? (
+                                        <div className="w-24 h-24 relative">
+                                            <img 
+                                                src={currentCuaca.iconUrl} 
+                                                alt={currentCuaca.cuaca}
+                                                className="w-full h-full object-contain drop-shadow-md scale-125"
+                                            />
+                                        </div>
+                                    ) : (
+                                        getFallbackIcon(currentCuaca.kodeCuaca)
+                                    )}
 
-                                <div className="justify-items-center space-y-0.5">
-                                    <h3 className="text-gray-500 font-medium text-sm md:text-base">
-                                        {dataCuaca.wilayah}
-                                    </h3>
-                                    <div className="text-4xl font-bold text-gray-800 my-1">
-                                        {dataCuaca.suhu}°C
-                                    </div>
-                                    <div className="text-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
-                                        {dataCuaca.cuaca}
-                                    </div>
-                                    <div className="text-center text-md text-gray-400">
-                                        {dataCuaca.jam}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-gray-600">
-                                <div className="flex items-center gap-2">
-                                    <Wind className="w-5 h-5 text-blue-400" />
-                                    <div>
-                                        <span className="block font-bold text-gray-800">{dataCuaca.anginSpeed} km/j</span>
-                                        <span className="text-xs">Arah {dataCuaca.anginDir}</span>
+                                    <div className="justify-items-center space-y-0.5">
+                                        <h3 className="text-gray-500 font-medium text-sm md:text-base flex items-center gap-1">
+                                            <MapPin className="w-3 h-3 text-blue-500" /> {currentCuaca.wilayah}
+                                        </h3>
+                                        <div className="text-4xl font-bold text-gray-800 my-1">
+                                            {currentCuaca.suhu}°C
+                                        </div>
+                                        <div className="text-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                                            {currentCuaca.cuaca}
+                                        </div>
+                                        <div className="text-center text-md text-gray-400">
+                                            {currentCuaca.jam} WITA
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <Droplets className="w-5 h-5 text-blue-400" />
-                                    <div>
-                                        <span className="block font-bold text-gray-800">{dataCuaca.kelembapan}%</span>
-                                        <span className="text-xs">Kelembapan</span>
+                                
+                                <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-gray-600">
+                                    <div className="flex items-center gap-2">
+                                        <Wind className="w-5 h-5 text-blue-400" />
+                                        <div>
+                                            <span className="block font-bold text-gray-800">{currentCuaca.anginSpeed} km/j</span>
+                                            <span className="text-xs">Arah {currentCuaca.anginDir}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Droplets className="w-5 h-5 text-blue-400" />
+                                        <div>
+                                            <span className="block font-bold text-gray-800">{currentCuaca.kelembapan}%</span>
+                                            <span className="text-xs">Kelembapan</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <Link href="/cuaca/prakiraan" className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition group">
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </Link>
+                                <Link href="/cuaca/prakiraan" className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition group">
+                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
                         </div>
                     ) : (
-                        <div className="text-center text-gray-500 py-4">Memuat data cuaca...</div>
+                        <div className="text-center text-gray-500 py-4 flex flex-col items-center">
+                           <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full mb-2"></div>
+                           Memuat data cuaca...
+                        </div>
+                    )}
+
+                    {/* --- PAGINATION DOTS --- */}
+                    {listCuaca && listCuaca.length > 1 && (
+                        // 3. Ubah mt-6 jadi mt-4 agar lebih rapat
+                        <div className="flex justify-center items-center gap-1.5 mt-4 w-full">
+                            {listCuaca.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentIndex(idx)}
+                                    className="p-1 focus:outline-none"
+                                    aria-label={`Slide ${idx + 1}`}
+                                >
+                                    <div 
+                                        className={`h-1.5 rounded-full transition-all duration-500 ${
+                                            idx === currentIndex 
+                                            ? "w-6 bg-blue-500" 
+                                            : "w-1.5 bg-gray-300 hover:bg-gray-400"
+                                        }`} 
+                                    />
+                                </button>
+                            ))}
+                        </div>
                     )}
                 </div>
             )}
 
-            {/* KONTEN GEMPA */}
+            {/* KONTEN GEMPA (Tidak Berubah) */}
             {activeTab === "gempa" && (
                 <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
                     {dataGempa ? (

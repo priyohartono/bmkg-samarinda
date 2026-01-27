@@ -53,5 +53,7 @@ export interface WeatherData {
   hourly: HourlyForecast[];
   daily: DailyForecast[];
   tableData?: GeneralForecastRow[];
-  tempRange?: string; // FIELD BARU: Opsional, hanya untuk tampilan Provinsi
+  tempRange?: string;
+  image: string;
+  tcc: number;
 }

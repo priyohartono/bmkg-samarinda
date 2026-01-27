@@ -2,18 +2,22 @@ import Link from "next/link";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { ArrowRight } from "lucide-react";
+
+// Components
 import RunningText from "@/components/RunningText";
 import InfoWidget from "@/components/InfoWidget";
-import { getGempaTerbaru } from "@/lib/bmkg/gempa";
-import { getCuacaSamarinda } from "@/lib/bmkg/cuaca";
 import AviationSection from "@/components/AviationSection";
 import ServiceSection from "@/components/ServiceSection";
 import AppPromo from "@/components/AppPromo";
 import NewsBulletinSection from "@/components/NewsBulletinSection";
-import FlyerSection from "@/components/FlyerSection"; // <--- Import
+import FlyerSection from "@/components/FlyerSection";
 
+// Data Fetching Helpers
+import { getGempaTerbaru } from "@/lib/bmkg/gempa";
+// UBAH: Import fungsi baru getKaltimWeather
+import { getKaltimWeather } from "@/lib/weather-service"; 
 
-export const revalidate = 30; 
+export const revalidate = 60; 
 
 export default async function HomePage() {
   // 1. Ambil Berita Utama
@@ -27,7 +31,7 @@ export default async function HomePage() {
     });
   }
 
-  // 2. Ambil 3 Berita Terbaru (Kecuali Hero)
+  // 2. Ambil 3 Berita Terbaru
   const latestPosts = await prisma.post.findMany({
     where: { id: { not: heroPost?.id } },
     orderBy: { createdAt: "desc" },
@@ -40,10 +44,11 @@ export default async function HomePage() {
     orderBy: { createdAt: "desc" },
   });
 
-  // 4. Ambil Data Gempa & Cuaca
-  const [gempaData, cuacaData] = await Promise.all([
+  // 4. AMBIL DATA GEMPA & CUACA (OPTIMALISASI BARU)
+  // Kita melakukan 2 fetch paralel: Gempa & Seluruh Kaltim (1 Request)
+  const [gempaData, listCuacaKaltim] = await Promise.all([
     getGempaTerbaru(),
-    getCuacaSamarinda(),
+    getKaltimWeather()
   ]);
 
   // 5. AMBIL DATA FLYER 
@@ -95,7 +100,11 @@ export default async function HomePage() {
       )}
 
       {/* 3. WIDGET CUACA & GEMPA */}
-      <InfoWidget dataGempa={gempaData} dataCuaca={cuacaData} />
+      {/* Langsung kirim hasil dari getKaltimWeather */}
+      <InfoWidget 
+        dataGempa={gempaData} 
+        listCuaca={listCuacaKaltim} 
+      />
 
       {/* 4. AVIATION SECTION */}
       <AviationSection />
@@ -103,13 +112,13 @@ export default async function HomePage() {
       {/* 5. LAYANAN PUBLIK */}
       <ServiceSection />
 
-      {/* 6. FLYER / PENGUMUMAN (BARU) */}
+      {/* 6. FLYER / PENGUMUMAN */}
       <FlyerSection flyers={flyers} />
 
-      {/* 6. BERITA & BULETIN (KOMPONEN BARU) */}
+      {/* 7. BERITA & BULETIN */}
       <NewsBulletinSection posts={latestPosts} bulletin={latestBulletin} />
 
-      {/* 7. PROMO APLIKASI */}
+      {/* 8. PROMO APLIKASI */}
       <AppPromo />
 
     </main>
