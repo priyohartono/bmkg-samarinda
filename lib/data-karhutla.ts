@@ -1,164 +1,135 @@
-"use server";
-
-import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+// lib/data-karhutla.ts
 
 export interface HotspotData {
   id: string;
   lat: number;
   lng: number;
   conf: number;
-  district: string;
-  subDistrict: string;
   satellite: string;
   date: string;
+  subDistrict: string;
+  district?: string;
 }
 
-// GET (Public)
-// lib/data-karhutla.ts
+// Helper: Format Date ke YYYYMMDD
+const formatDateYMD = (date: Date) => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}`;
+};
 
-export async function getHotspots() {
+// Helper: Fetch Data per Tanggal (Parsing TXT Manual)
+async function fetchBMKGHotspot(date: Date): Promise<HotspotData[]> {
+  const dateStr = formatDateYMD(date);
+  
+  // URL File TXT BMKG
+  const url = `https://cews.bmkg.go.id/tempatirk/HOTSPOT/${dateStr}/hotspot_${dateStr}.txt`;
+
   try {
-    // 1. Tentukan rentang waktu "Berlaku Hari Ini" (Termasuk data kemarin)
-    const filterDate = new Date();
-    filterDate.setDate(filterDate.getDate() - 1); // Mundur 1 hari
-    filterDate.setHours(0, 0, 0, 0); // Mulai dari jam 00:00 kemarin
+    const res = await fetch(url, { next: { revalidate: 3600 } }); // Cache 1 jam
 
-    const data = await prisma.hotspot.findMany({
-      where: {
-        // FILTER: Data sejak kemarin jam 00:00
-        date: {
-          gte: filterDate
-        }
-      },
-      orderBy: { date: 'desc' },
-    });
+    if (!res.ok) {
+        if (res.status === 404) return [];
+        throw new Error(`Failed to fetch hotspot data: ${res.status}`);
+    }
 
-    return data.map(h => ({
-      id: h.id,
-      lat: h.latitude,
-      lng: h.longitude,
-      conf: h.confidence || 0,
-      district: h.district,
-      subDistrict: h.subDistrict,
-      satellite: h.satellite,
-      date: h.date.toISOString().split('T')[0]
-    }));
+    const textData = await res.text();
+    if (!textData) return [];
+
+    // Pecah per baris
+    const lines = textData.trim().split('\n');
+
+    // Skip Baris Pertama (Header)
+    const dataRows = lines.slice(1);
+
+    const cleanData = dataRows
+      .map((line, index) => {
+        const col = line.split('\t');
+
+        // Pastikan baris memiliki data yang cukup
+        if (col.length < 10) return null;
+
+        const prov = col[4]?.trim() || ""; 
+        
+        // Filter Khusus KALIMANTAN TIMUR
+        if (!prov.toUpperCase().includes("KALIMANTAN TIMUR")) return null;
+
+        return {
+          id: `${dateStr}-${index}`,
+          lng: parseFloat(col[0]),        // Index 0: BUJUR
+          lat: parseFloat(col[1]),        // Index 1: LINTANG
+          conf: parseInt(col[2]) || 0,    // Index 2: KEPERCAYAAN
+          district: col[5]?.trim(),       // Index 5: KABUPATEN
+          subDistrict: col[6] ? `Kec. ${col[6].trim()}` : "Kecamatan Tdk Teridentifikasi", // Index 6
+          satellite: col[7]?.trim(),      // Index 7: SATELIT
+          date: `${col[8]} ${col[9]} WIB`,// Index 8 & 9: TGL & WAKTU
+        };
+      })
+      // PERBAIKAN FILTER: Menggunakan casting 'as HotspotData[]' agar lebih aman
+      .filter((item) => item !== null) as HotspotData[];
+
+    return cleanData;
+
   } catch (error) {
-    console.error("Gagal ambil hotspot:", error);
+    console.error(`Error fetching hotspot for ${dateStr}:`, error);
     return [];
   }
 }
 
-// BULK INSERT (Admin)
-// Menerima string mentah dari Excel/TSV
-export async function importHotspots(rawData: string) {
-  try {
-    // 1. Hapus data lama (Opsional: agar peta selalu fresh hari ini)
-    // await prisma.hotspot.deleteMany({}); 
+// FUNGSI UTAMA 1: Ambil Data Terbaru (Hari Ini atau Kemarin)
+export async function getHotspots(): Promise<HotspotData[]> {
+  const today = new Date();
+  
+  // Gunakan 'let' agar bisa diubah nilainya jika hari ini kosong
+  let data = await fetchBMKGHotspot(today);
 
-    // 2. Parsing Data
-    const rows = rawData.trim().split('\n');
-    const validData = [];
-
-    for (const row of rows) {
-      // Asumsi format: Long | Lat | Conf | Region | Prov | Kab | Kec | Sat | Date | Time ...
-      // Split by Tab (\t) atau Spasi berulang
-      const cols = row.split(/\t/);
-
-      if (cols.length < 8) continue; // Skip baris rusak
-
-      const lng = parseFloat(cols[0]); // Longitude biasanya kolom pertama di data Sipongi
-      const lat = parseFloat(cols[1]);
-      const conf = parseInt(cols[2]) || 0;
-      const prov = cols[4];
-      const kab = cols[5];
-      const kec = cols[6];
-      const sat = cols[7];
-      const dateStr = cols[8]; // YYYY-MM-DD
-      const timeStr = cols[9] || "00:00:00"; // HH:MM:SS
-
-      // Filter hanya Kaltim (jaga-jaga admin copas semua Kalimantan)
-      if (prov?.includes("TIMUR") && !isNaN(lat) && !isNaN(lng)) {
-
-        // PENTING: Pakai Offset +07:00 (WIB) agar jamnya akurat di Database
-        // Format: YYYY-MM-DDTHH:mm:ss+07:00
-        const isoString = `${dateStr}T${timeStr}${timeStr.length === 5 ? ':00' : ''}+07:00`;
-        const dateObj = new Date(isoString);
-
-        if (!isNaN(dateObj.getTime())) {
-          validData.push({
-            latitude: lat,
-            longitude: lng,
-            confidence: conf,
-            province: prov,
-            district: kab,
-            subDistrict: kec,
-            satellite: sat,
-            date: dateObj
-          });
-        }
-      }
-    }
-
-    if (validData.length === 0) return { success: false, msg: "Tidak ada data valid ditemukan." };
-
-    // 3. Simpan ke Database
-    await prisma.hotspot.createMany({
-      data: validData
-    });
-
-    revalidatePath("/cuaca/karhutla");
-    return { success: true, count: validData.length };
-
-  } catch (error) {
-    console.error("Import error:", error);
-    return { success: false, msg: "Gagal import data." };
+  // Jika hari ini kosong, ambil kemarin
+  if (data.length === 0) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    data = await fetchBMKGHotspot(yesterday);
   }
+
+  return data;
 }
 
-// DELETE ALL (Reset Data)
-export async function clearHotspots() {
-  await prisma.hotspot.deleteMany({});
-  revalidatePath("/cuaca/karhutla");
-  return { success: true };
-}
-
-
-
-// ... imports existing
-
-// Tambahkan fungsi ini
+// FUNGSI UTAMA 2: Ambil Trend 7 Hari Terakhir (Hanya Jumlah)
 export async function getHotspotTrend() {
-  // 1. Generate 7 hari terakhir
-  const dates = [];
+  const promises = [];
+  const today = new Date();
+
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
-    d.setDate(d.getDate() - i);
-    dates.push(d.toISOString().split('T')[0]); // Format YYYY-MM-DD
+    d.setDate(today.getDate() - i);
+    promises.push(fetchBMKGHotspot(d));
   }
 
-  try {
-    // 2. Query GroupBy Date (Raw Query atau JS processing)
-    // Karena Prisma GroupBy agak tricky dengan DateTime, kita tarik data 7 hari terakhir lalu hitung di JS
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const results = await Promise.all(promises);
 
-    const data = await prisma.hotspot.findMany({
-      where: {
-        date: { gte: sevenDaysAgo }
-      },
-      select: { date: true }
-    });
+  return results.map((dailyData, index) => {
+    const d = new Date();
+    d.setDate(today.getDate() - (6 - index)); 
+    return {
+      date: d.toISOString(),
+      count: dailyData.length,
+    };
+  });
+}
 
-    // 3. Mapping count per tanggal
-    const stats = dates.map(dateStr => {
-      const count = data.filter(d => d.date.toISOString().split('T')[0] === dateStr).length;
-      return { date: dateStr, count };
-    });
+// FUNGSI UTAMA 3: Ambil Data RAW 7 Hari Terakhir (Untuk Peta Mingguan)
+export async function getRawWeeklyHotspots(): Promise<HotspotData[]> {
+  const promises = [];
+  const today = new Date();
 
-    return stats;
-  } catch (error) {
-    return dates.map(d => ({ date: d, count: 0 }));
+  // Loop 7 hari ke belakang
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(today.getDate() - i);
+    promises.push(fetchBMKGHotspot(d));
   }
+
+  const results = await Promise.all(promises);
+  // Menggabungkan array of arrays menjadi satu array flat
+  return results.flat();
 }

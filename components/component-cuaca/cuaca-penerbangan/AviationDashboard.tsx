@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plane, MapPin, BarChart3 } from "lucide-react"; // Tambah BarChart3
+import { Plane, MapPin } from "lucide-react"; 
 import { ParsedMetar } from "@/lib/bmkg/aviation-utils";
 import AviationMapWrapper from "@/components/component-cuaca/cuaca-penerbangan/AviationMapWrapper";
 import HeroAirportCard from "./HeroAirportCard";

@@ -1,6 +1,6 @@
 // components/component-cuaca/cuaca-penerbangan/FlightSharedUI.tsx
 import { ParsedMetar, getPublicSummary, getVisibilityStatus } from "@/lib/bmkg/aviation-utils";
-import { Thermometer, Eye } from "lucide-react";
+import { Thermometer} from "lucide-react";
 
 // 1. Metric Item (Kotak Kecil) - TIDAK ADA PERUBAHAN
 export function TicketMetricItem({ icon, label, value, sub, mini = false }: any) {

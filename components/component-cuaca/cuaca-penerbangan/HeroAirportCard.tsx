@@ -229,7 +229,7 @@ export default function HeroAirportCard({ airport }: { airport: ParsedMetar }) {
                          {loadingRaw ? (
                                 <div className="p-12 flex flex-col items-center justify-center text-slate-400 gap-4">
                                     <Loader2 className="w-8 h-8 animate-spin text-blue-500" /> 
-                                    <span className="font-medium">Mengambil data raw dari satelit...</span>
+                                    <span className="font-medium">Mengambil data dari Aviation BMKG...</span>
                                 </div>
                             ) : rawData ? (
                                 <div className="flex flex-col gap-2 p-2">
@@ -238,7 +238,7 @@ export default function HeroAirportCard({ airport }: { airport: ParsedMetar }) {
                                     <RawDataBlock title="TAF" data={rawData.taf} colorClass="text-blue-400" bgClass="bg-blue-500/10" borderClass="border-blue-500/20" isTaf={true} />
                                 </div>
                             ) : (
-                                <div className="p-8 text-center text-slate-500 font-medium">Gagal memuat data raw.</div>
+                                <div className="p-8 text-center text-slate-500 font-medium">Gagal memuat data.</div>
                             )}
                     </div>
                 )}

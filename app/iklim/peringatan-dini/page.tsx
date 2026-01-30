@@ -173,20 +173,20 @@ export default function PeringatanDiniPage() {
                     <h4 className="text-[10px] font-bold text-slate-400 uppercase mb-2">Legenda</h4>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span> 
-                            <span className="text-[10px] font-semibold text-slate-600">Aman</span>
+                            <span className="w-2 h-2 rounded-xl bg-emerald-500"></span> 
+                            <span className="text-xs text-slate-600">Aman</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-yellow-400"></span> 
-                            <span className="text-[10px] font-semibold text-slate-600">Waspada</span>
+                            <span className="w-2 h-2 rounded-xl bg-yellow-400"></span> 
+                            <span className="text-xs text-slate-600">Waspada</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-orange-500"></span> 
-                            <span className="text-[10px] font-semibold text-slate-600">Siaga</span>
+                            <span className="w-2 h-2 rounded-xl bg-orange-500"></span> 
+                            <span className="text-xs text-slate-600">Siaga</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-red-600"></span> 
-                            <span className="text-[10px] font-semibold text-slate-600">Awas</span>
+                            <span className="w-2 h-2 rounded-xl bg-red-600"></span> 
+                            <span className="text-xs text-slate-600">Awas</span>
                         </div>
                     </div>
                 </div>

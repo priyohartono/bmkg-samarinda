@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   CloudSun, AlertTriangle, Plane, Ship, ChevronDown, Users, ClipboardList,
   FileText, Target, Activity, Map, DropletOff,
-  Satellite, Flame, Newspaper, BookA, BookText, Menu, X, OctagonAlert, CloudRain, BarChart3
+  Satellite, Flame, Newspaper, BookA, BookText, Menu, X, OctagonAlert, CloudRain, BarChart3, Leaf
 } from "lucide-react";
 
 // --- 1. Definisi Data Menu (Disatukan dalam Array Object) ---
@@ -50,6 +50,7 @@ const NAV_ITEMS = [
       { name: "Prakiraan Hujan", desc: "Prakiraan Hujan", href: "/iklim/prakiraan-hujan", icon: <CloudRain className="w-5 h-5 text-blue-500" /> },
       { name: "Analisis Hujan", desc: "Analisis Hujan", href: "/iklim/analisis-hujan", icon: <BarChart3 className="w-5 h-5 text-blue-500" /> },
       { name: "PDIE", desc: "Peringatan Dini Iklim Ekstrem", href: "/iklim/peringatan-dini", icon: <OctagonAlert className="w-5 h-5 text-blue-500" /> },
+      { name: "Kualitas Udara", desc: "Pantauan Konsentrasi PM25", href: "/iklim/kualitas-udara", icon: <Leaf className="w-5 h-5 text-blue-500" /> },
     ]
   },
   {

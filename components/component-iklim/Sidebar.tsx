@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DropletOff, CloudRain, BarChart3, ChevronRight, OctagonAlert } from "lucide-react";
+import { DropletOff, CloudRain, BarChart3, ChevronRight, OctagonAlert, Leaf } from "lucide-react";
 
 const sidebarItems = [
   { 
@@ -24,6 +24,11 @@ const sidebarItems = [
     name: "PDIE", 
     href: "/iklim/peringatan-dini", 
     icon: <OctagonAlert className="w-4 h-4" /> 
+  },
+  { 
+    name: "Kualitas Udara", 
+    href: "/iklim/kualitas-udara", 
+    icon: <Leaf className="w-4 h-4" /> 
   },
 ];
 
