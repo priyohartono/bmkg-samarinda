@@ -56,18 +56,14 @@ export default function AirQualityView() {
 
   // --- LOGIKA TREND (BARU) ---
   const getTrendInfo = () => {
-    // Ambil hanya data yang valid (bukan null)
     const validHistory = data.history.filter((h: any) => h.pm25 !== null);
     
-    // Butuh minimal 2 data untuk membandingkan
     if (validHistory.length < 2) return null;
 
-    // Ambil data terakhir (current) dan sebelumnya
     const current = validHistory[validHistory.length - 1].pm25;
     const previous = validHistory[validHistory.length - 2].pm25;
     const diff = current - previous;
 
-    // Logika Warna: Polusi Naik = Merah (Buruk), Polusi Turun = Hijau (Baik)
     if (diff > 0) return { icon: TrendingUp, text: "Meningkat", color: "text-red-600", bg: "bg-red-50 border-red-100" };
     if (diff < 0) return { icon: TrendingDown, text: "Menurun", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-100" };
     return { icon: Minus, text: "Stabil", color: "text-slate-500", bg: "bg-slate-50 border-slate-100" };
@@ -79,29 +75,36 @@ export default function AirQualityView() {
   const TrendIcon = trend ? trend.icon : null;
 
   return (
-    <div className="min-h-screen text-slate-800 pb-10 relative overflow-x-hidden">
+    // FIX 1: Hapus overflow-x-hidden di sini jika parent layout sudah handle, 
+    // tapi tetap aman dipertahankan. Gunakan w-full.
+    <div className="w-full min-h-screen text-slate-800 pb-10 overflow-x-hidden">
       
       {/* HEADER */}
-      <div className="relative z-10 pt-0 pb-6 px-0 md:px-4 border-b border-slate-200/60 bg-white/80 backdrop-blur-sm top-0">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-              Kualitas Udara Kota Samarinda
-            </h1>
-            <p className="text-slate-500 text-sm mt-1 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5" />
-              Stasiun: BMKG APT Pranoto Samarinda
-            </p>
-          </div>
-          <div className="text-right hidden md:block">
-            <div className="text-xs  text-slate-400 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm inline-block">
-              Update Terakhir: <span className="text-slate-600 font-bold">{data.lastUpdate} WITA</span>
+      {/* FIX 2: Layout header diperbaiki agar padding konsisten */}
+      <div className="sticky top-0 z-20 border-b border-slate-200/60 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
+                Kualitas Udara Kota Samarinda
+              </h1>
+              <p className="text-slate-500 text-xs md:text-sm mt-1 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="truncate">Stasiun: BMKG APT Pranoto Samarinda</span>
+              </p>
+            </div>
+            <div className="text-right hidden md:block flex-shrink-0">
+              <div className="text-xs text-slate-400 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm inline-block">
+                Update Terakhir: <span className="text-slate-600 font-bold">{data.lastUpdate}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-0 md:px-4 mt-8 space-y-6">
+      {/* MAIN CONTENT WRAPPER */}
+      {/* FIX 3: Gunakan max-w-7xl dan mx-auto agar konten terpusat dan tidak melebar tak terbatas */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 md:mt-8 space-y-6">
 
         {loading && (
            <div className="h-64 flex flex-col items-center justify-center bg-white rounded-3xl border border-slate-200 shadow-sm animate-pulse">
@@ -112,13 +115,16 @@ export default function AirQualityView() {
 
         {!loading && !error && (
           // BENTO GRID LAYOUT
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          // FIX 4: Gunakan gap-4 di mobile, gap-6 di layar besar
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
             
             {/* KARTU 1: GAUGE UTAMA */}
-            <div className="bg-white rounded-[2rem] p-2 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center justify-center text-center relative overflow-hidden group">
+            <div className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center justify-center text-center relative overflow-hidden group min-h-[400px]">
 
-                <div className="relative w-56 h-56 mb-6">
-                  <svg className="w-full h-full transform -rotate-90">
+                {/* Gauge SVG Container */}
+                <div className="relative w-48 h-48 sm:w-56 sm:h-56 mb-6 flex-shrink-0">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 224 224">
+                    {/* Menggunakan viewBox agar SVG responsif */}
                     <circle cx="112" cy="112" r="96" stroke="#f1f5f9" strokeWidth="12" fill="transparent" strokeLinecap="round" />
                     <circle 
                       cx="112" cy="112" r="96" stroke={currentColor} strokeWidth="12" fill="transparent" 
@@ -129,16 +135,16 @@ export default function AirQualityView() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-6xl font-extrabold text-slate-800 tracking-tighter drop-shadow-sm">
+                    <span className="text-5xl sm:text-6xl font-extrabold text-slate-800 tracking-tighter drop-shadow-sm">
                       {data.current}
                     </span>
-                    <span className="text-xs font-bold text-slate-400 tracking-widest mt-2 bg-slate-50 px-2 py-1 rounded">
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-400 tracking-widest mt-2 bg-slate-50 px-2 py-1 rounded">
                       PM<sub>2.5</sub> µg/m³
                     </span>
                   </div>
                 </div>
 
-                <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">
                     {statusInfo.text}
                 </h2>
                 {/* --- INDIKATOR TREN  --- */}
@@ -148,78 +154,95 @@ export default function AirQualityView() {
                         <span>Tren: {trend.text}</span>
                     </div>
                 )}
-                <p className="text-slate-500 text-sm leading-relaxed max-w-xs mx-auto">
+                <p className="text-slate-500 text-sm leading-relaxed max-w-[200px] sm:max-w-xs mx-auto">
                     {statusInfo.desc}
                 </p>
             </div>
 
             {/* KARTU 2: GRAFIK */}
-            <div className="lg:col-span-2 bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col">
-              <div className="flex items-center justify-between mb-6">
+            {/* KARTU 2: GRAFIK */}
+            <div className="lg:col-span-2 bg-white rounded-[2rem] p-5 sm:p-6 md:p-8 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col min-h-[400px]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
                 <div>
                   <h3 className="text-lg font-bold text-slate-800">Data 24 Jam Terakhir</h3>
                   <p className="text-sm text-slate-400">Riwayat konsentrasi PM2.5 per jam</p>
                 </div>
               </div>
 
-              <div className="flex-1 w-full min-h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.history} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barCategoryGap="20%">
-                    <defs>
-                      {data.history.map((entry: any, index: number) => {
-                          const color = entry.pm25 !== null ? getPm25Color(entry.pm25) : 'transparent';
-                          return (
-                            <linearGradient key={`grad-${index}`} id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={color} stopOpacity={1}/>
-                              <stop offset="100%" stopColor={color} stopOpacity={0.6}/>
-                            </linearGradient>
-                          );
-                      })}
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis 
-                        dataKey="time" axisLine={false} tickLine={false} 
-                        tick={{ fontSize: 11, fill: '#94a3b8' }} dy={10} 
-                    />
-                    <YAxis 
-                        axisLine={false} tickLine={false} 
-                        tick={{ fontSize: 11, fill: '#94a3b8' }} 
-                        label={{ value: 'µg/m³', angle: -90, position: 'insideLeft', offset: 10, fontSize: 10, fill: '#cbd5e1' }}
-                    />
-                    <Tooltip 
-                      cursor={{ fill: '#f8fafc', radius: 8 }}
-                      content={({ active, payload, label }) => {
-                        if (active && payload && payload.length) {
-                          const val = payload[0].value as number;
-                          if (val === null) return null;
-                          const color = getPm25Color(val);
-                          return (
-                            <div className="bg-white/95 backdrop-blur px-3 py-2 border border-slate-100 shadow-xl rounded-md text-xs">
-                              <p className="font-bold text-slate-700 mb-0.5">Jam {label}:00</p>
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{background: color}}></div>
-                                <span className=" font-bold text-sm">{val}</span>
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Bar dataKey="pm25" radius={[4, 4, 4, 4]}>
-                      {data.history.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={`url(#grad-${index})`} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+              {/* FIX: Ganti flex-1/min-h dengan tinggi pasti (h-[300px]) */}
+              <div className="w-full h-[300px] min-w-0 relative">
+                 {/* Cek jika data kosong, tampilkan pesan */}
+                 {data.history.length === 0 ? (
+                    <div className="absolute inset-0 flex items-center justify-center text-slate-400 text-sm italic">
+                        Belum ada data riwayat tersedia
+                    </div>
+                 ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data.history} margin={{ top: 10, right: 0, left: -10, bottom: 0 }} barCategoryGap="20%">
+                        <defs>
+                        {data.history.map((entry: any, index: number) => {
+                            const color = entry.pm25 !== null ? getPm25Color(entry.pm25) : 'transparent';
+                            return (
+                                <linearGradient key={`grad-${index}`} id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={color} stopOpacity={1}/>
+                                <stop offset="100%" stopColor={color} stopOpacity={0.6}/>
+                                </linearGradient>
+                            );
+                        })}
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                        <XAxis 
+                            dataKey="time" 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fontSize: 10, fill: '#94a3b8' }} 
+                            dy={10} 
+                            interval="preserveStartEnd"
+                            minTickGap={10}
+                        />
+                        <YAxis 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fontSize: 10, fill: '#94a3b8' }} 
+                            label={{ value: 'µg/m³', angle: -90, position: 'insideLeft', offset: 0, fontSize: 10, fill: '#cbd5e1' }}
+                        />
+                        <Tooltip 
+                            cursor={{ fill: '#f8fafc', radius: 8 }}
+                            content={({ active, payload, label }) => {
+                                if (active && payload && payload.length) {
+                                const val = payload[0].value as number;
+                                if (val === null) return null;
+                                const color = getPm25Color(val);
+                                return (
+                                    <div className="bg-white/95 backdrop-blur px-3 py-2 border border-slate-100 shadow-xl rounded-md text-xs z-50">
+                                    <p className="font-bold text-slate-700 mb-0.5">Jam {label}:00</p>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full" style={{background: color}}></div>
+                                        <span className=" font-bold text-sm">{val}</span>
+                                    </div>
+                                    </div>
+                                );
+                                }
+                                return null;
+                            }}
+                        />
+                        <Bar dataKey="pm25" radius={[4, 4, 4, 4]}>
+                        {data.history.map((entry: any, index: number) => (
+                            <Cell key={`cell-${index}`} fill={`url(#grad-${index})`} />
+                        ))}
+                        </Bar>
+                    </BarChart>
+                    </ResponsiveContainer>
+                 )}
               </div>
             </div>
 
             {/* KARTU 3: LEGEND */}
-            <div className="lg:col-span-3 bg-white rounded-[2rem] p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div className="lg:col-span-3 bg-white rounded-[2rem] p-5 sm:p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 text-center">Panduan Indeks Kualitas Udara</h4>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                
+                {/* FIX 5: Grid legend dibuat responsive */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
                     {[
                         { label: "Baik", range: "0 - 15.5 µg/m³", color: COLORS.BAIK, bg: "bg-emerald-50 text-emerald-700" },
                         { label: "Sedang", range: "15.6 - 55.4 µg/m³", color: COLORS.SEDANG, bg: "bg-blue-50 text-blue-700" },
@@ -229,14 +252,14 @@ export default function AirQualityView() {
                     ].map((item, idx) => (
                         <div key={idx} className={`rounded-xl p-3 text-center border border-transparent hover:border-slate-200 transition-colors ${item.bg}`}>
                             <div className="w-4 h-4 rounded-md mx-auto mb-2" style={{ backgroundColor: item.color }}></div>
-                            <div className="font-bold text-sm mb-0.5">{item.label}</div>
+                            <div className="font-bold text-sm mb-0.5 whitespace-nowrap">{item.label}</div>
                             <div className="text-[10px] opacity-80">{item.range}</div>
                         </div>
                     ))}
                 </div>
 
                 {/* --- BAGIAN BARU: DESKRIPSI PM2.5 --- */}
-                <div className="pt-6 border-t border-slate-100 flex flex-col md:flex-row gap-5 items-start">
+                <div className="pt-6 border-t border-slate-100 flex flex-col md:flex-row gap-5 items-start mt-6">
                     <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl shrink-0">
                         <BookOpen className="w-6 h-6" />
                     </div>

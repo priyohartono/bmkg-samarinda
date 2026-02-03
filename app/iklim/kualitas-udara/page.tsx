@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import AirQualityView from "@/components/component-cuaca/kualitas-udara/AirQualityView";
+import AirQualityView from "@/components/component-iklim/kualitas-udara/AirQualityView";
 
 export const metadata: Metadata = {
   title: "Kualitas Udara | BMKG APT Pranoto Samarinda",

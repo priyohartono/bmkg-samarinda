@@ -9,7 +9,8 @@ import {
   Ship, 
   Satellite, 
   Flame, 
-  ChevronRight 
+  ChevronRight, 
+  Waves
 } from "lucide-react";
 
 const sidebarItems = [
@@ -42,6 +43,11 @@ const sidebarItems = [
     name: "Peringatan Karhutla", 
     href: "/cuaca/karhutla", 
     icon: <Flame className="w-4 h-4" /> 
+  },
+  { 
+    name: "Cuaca Mahakam", 
+    href: "/cuaca/mahakam", 
+    icon: <Waves className="w-4 h-4" /> 
   },
 ];
 

@@ -1,44 +1,38 @@
-"use client";
+import React from 'react';
+import { getMahakamDataFull } from '@/lib/weather-service';
+import MahakamDashboard from '@/components/component-cuaca/mahakam/MahakamDashboard';
+import { Ship } from 'lucide-react';
 
-import dynamic from "next/dynamic";
-import RiverForecastView from "@/components/component-cuaca/mahakam/RiverForecastView";
+export const revalidate = 300;
 
-// Import Peta Dinamis
-const RiverMap = dynamic(
-  () => import("@/components/component-cuaca/mahakam/RiverMap"), 
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-[700px] bg-slate-100 rounded-[2.5rem] animate-pulse flex items-center justify-center text-slate-400">
-        Memuat Peta Satelit...
-      </div>
-    )
-  }
-);
+export default async function MahakamWeatherPage() {
+  const mahakamData = await getMahakamDataFull();
 
-export default function MahakamPage() {
   return (
-    <main className="bg-[#F0F4F8] min-h-screen">
-        {/* Bagian List View (Zig Zag) */}
-        <RiverForecastView />
-        
-        {/* Bagian Peta Satelit */}
-        {/* PERUBAHAN DI SINI: max-w-7xl (Lebih Lebar) */}
-        <section className="max-w-[90rem] mx-auto px-4 md:px-8 pb-24 -mt-16 relative z-10">
-            <div className="bg-white p-4 md:p-8 rounded-[3rem] shadow-2xl border border-slate-200">
-                <div className="mb-8 px-2 text-center md:text-left">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 flex items-center justify-center md:justify-start gap-3">
-                        🛰️ Peta Sebaran Cuaca
-                    </h2>
-                    <p className="text-slate-500 mt-2">
-                        Pantau posisi awan hujan dan kondisi angin secara spasial di sepanjang alur sungai.
-                    </p>
+    <main className="min-h-screen bg-slate-50/50 pb-20">
+      
+      {/* HEADER SECTION */}
+      <div className="bg-white border-b border-slate-200 pt-8 pb-8 px-4 md:px-8">
+        <div className="w-full mx-auto">
+            <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                    <Ship size={24} />
                 </div>
-                
-                {/* Render Peta */}
-                <RiverMap />
+                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    Cuaca Maritim Mahakam
+                </h1>
             </div>
-        </section>
+            <p className="text-slate-500 max-w-2xl text-sm md:text-base">
+                Sistem monitoring terpadu jalur pelayaran Sungai Mahakam.
+            </p>
+        </div>
+      </div>
+      
+      <div className="w-full mx-auto px-4 md:px-8 mt-8">
+         {/* CLIENT WRAPPER (Map + Detail Interaktif) */}
+         <MahakamDashboard data={mahakamData} />
+      </div>
+
     </main>
   );
 }

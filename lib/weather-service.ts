@@ -4,6 +4,7 @@ import { BMKGResponse, BMKGWeatherItem } from './bmkg-types';
 import { WeatherData, RegionLevel } from './types';
 // IMPORT HELPER YANG ANDA BERIKAN
 import { calculateFeelsLike } from './weather-utils'; 
+import { MAHAKAM_LOCATIONS } from '@/lib/mahakam-data';
 
 // Helper getLevel & mapWeatherIcon (TETAP SAMA)
 const getLevel = (id: string): RegionLevel => {
@@ -295,4 +296,37 @@ export const getKaltimWeather = async () => {
     console.error("Error fetching Kaltim weather:", error);
     return [];
   }
+};
+
+
+// lib/weather-service.ts (Update bagian getMahakamDataFull)
+
+export const getMahakamDataFull = async () => {
+  const promises = MAHAKAM_LOCATIONS.map(async (loc) => {
+    const weatherData = await fetchBMKGData(loc.bmkgId);
+    
+    if (!weatherData) return { ...loc, weather: 'N/A', temp: 0 };
+
+    return {
+      ...loc,
+      weather: weatherData.condition,
+      temp: weatherData.temp,
+      iconUrl: weatherData.subRegions.length > 0 ? weatherData.subRegions[0].icon : "", 
+      windSpeed: weatherData.windSpeed,
+      humidity: weatherData.humidity,
+      feelsLike: weatherData.feelsLike,
+      windDeg: weatherData.tableData?.[0]?.wind.deg || 0, // Ambil derajat angin jam saat ini
+      visibility: weatherData.visibility, // P
+      forecasts: weatherData.tableData?.map(item => ({
+        time: item.time,
+        temp: item.temp,
+        weatherIcon: item.weatherIcon, 
+        condition: item.weatherDesc,
+        windSpeed: item.wind.speed,
+        windDeg: item.wind.deg 
+      })) || []
+    };
+  });
+
+  return await Promise.all(promises);
 };

@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const news = await prisma.post.findUnique({ where: { slug } });
   if (!news) return { title: "Berita Tidak Ditemukan" };
-  return { title: `${news.title} | BMKG Samarinda`, description: news.excerpt };
+  return { title: `${news.title} | BMKG APT Pranoto Samarinda`, description: news.excerpt };
 }
 
 export default async function DetailBeritaPage({ params }: PageProps) {
