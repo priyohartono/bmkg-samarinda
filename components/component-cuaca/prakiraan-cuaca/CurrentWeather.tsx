@@ -1,11 +1,11 @@
 import React from 'react';
-import { CloudRain, ArrowRight, Wind } from 'lucide-react';
+import { ArrowRight, Wind, MapPin } from 'lucide-react'; // Tambah MapPin biar manis
 import { WeatherData } from '@/lib/types';
 
 export default function CurrentWeather({ data }: { data: WeatherData }) {
   if (!data) return null;
 
-  // Cek apakah ini tampilan range (Provinsi) atau single (Kota/Kec)
+  // Cek apakah ini tampilan range (Provinsi)
   const isRange = !!data.tempRange;
 
   return (
@@ -17,66 +17,76 @@ export default function CurrentWeather({ data }: { data: WeatherData }) {
         
         <div className="relative z-10 flex justify-between items-start">
           <div>
+            {/* Header Lokasi Kecil */}
+            <div className="flex items-center gap-1 text-slate-400 mb-1 text-sm font-medium">
+               <MapPin className="w-4 h-4" />
+               {data.location}
+            </div>
+
             <div className="flex items-start">
               {/* LOGIKA TAMPILAN SUHU */}
               {isRange ? (
-                 // Tampilan Range (Font sedikit lebih kecil agar muat)
-                 <span className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tighter">
-                   {data.tempRange} ° C
-                 </span>
+                  // Tampilan Range (Provinsi)
+                  <div className="flex flex-col">
+                    <span className="text-5xl lg:text-6xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
+                      {data.tempRange} <span className="text-4xl text-slate-400">°C</span>
+                    </span>
+                    <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded w-fit mt-2">
+                        Rentang Suhu Wilayah
+                    </span>
+                  </div>
               ) : (
-                 // Tampilan Single (Normal)
-                 <>
-                   <span className="text-7xl md:text-8xl font-bold text-slate-900 tracking-tighter">
-                     {data.temp} ° C
-                   </span>
-                   <span className="text-4xl md:text-5xl font-medium text-slate-400 mt-2">°</span>
-                 </>
+                  // Tampilan Single (Kota/Kec)
+                  <span className="text-7xl md:text-8xl font-bold text-slate-900 tracking-tighter">
+                    {data.temp} <span className="text-4xl md:text-5xl text-slate-400 align-top">°C</span>
+                  </span>
               )}
             </div>
             
-            <div className="flex items-center gap-2 mt-1 pl-1">
-               <span className="text-xl text-slate-600 font-medium">
+            <div className="flex items-center gap-2 mt-2 pl-1">
+               <span className="text-xl text-slate-600 font-medium bg-slate-100/50 px-3 py-1 rounded-lg">
                  {data.condition}
                </span>
             </div>
           </div>
           
-          {/* UBAH BAGIAN INI: Render Image BMKG */}
-          <div className="p-4 bg-slate-50 rounded-3xl border border-slate-100">
-             {/* Gunakan tag img standar */}
+          {/* Render Image BMKG */}
+          <div className="p-4 bg-slate-50/80 backdrop-blur-sm rounded-3xl border border-slate-100 shadow-sm">
              <img 
                src={data.tableData?.[0].weatherIcon || "https://api-apps.bmkg.go.id/storage/icon/cuaca/berawan-am.svg"} 
                alt={data.condition}
-               className="w-20 h-20 object-contain drop-shadow-sm"
+               className="w-24 h-24 object-contain drop-shadow-md"
              />
           </div>
         </div>
 
-        <div className="relative z-10 mt-8 pt-6 border-t border-slate-50">
-          <p className="text-slate-600 font-medium mb-4">"{data.description}"</p>
+        <div className="relative z-10 mt-6 pt-2 border-t border-slate-50">
+          <p className="text-slate-600 font-medium mb-4 ">
+            "{data.description}"
+          </p>
+          
           <div className="flex flex-wrap gap-6 text-sm font-semibold text-slate-400">
             
-            {/* Hanya tampilkan detail angin/realfeel jika BUKAN range provinsi, 
-                karena angin di provinsi pasti beda-beda */}
+            {/* Detail Angin & RealFeel (Hanya tampil jika BUKAN range/provinsi) */}
             {!isRange && (
               <>
-                <div className="flex items-center gap-2">
-                   <Wind className="w-4 h-4" />
-                   <span>{data.windSpeed} km/j</span>
+                <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full">
+                   <Wind className="w-4 h-4 text-blue-400" />
+                   <span className="text-slate-600">{data.windSpeed} km/j</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1">
-                        <ArrowRight className="w-3 h-3 rotate-[-45deg]"/> Terasa {data.feelsLike}°
-                    </span>
+                <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full">
+                   <span className="flex items-center gap-1 text-slate-600">
+                       <ArrowRight className="w-3 h-3 rotate-[-45deg] text-orange-400"/> 
+                       Terasa {data.feelsLike}°
+                   </span>
                 </div>
               </>
             )}
 
-            {/* Untuk provinsi, tampilkan ringkasan lain (misal jumlah kota) */}
+            {/* Jika Provinsi, tampilkan info ringkas */}
             {isRange && (
-                <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
-                    Rata-rata se-provinsi
+                <div className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold border border-indigo-100">
+                    Rata-rata se-Provinsi
                 </div>
             )}
           </div>

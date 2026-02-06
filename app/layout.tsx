@@ -25,7 +25,6 @@ export const metadata: Metadata = {
   applicationName: 'BMKG APT Pranoto',
   authors: [{ name: 'BMKG Stasiun Meteorologi APT Pranoto', url: 'https://bmkg.go.id' }],
   keywords: ['Cuaca Samarinda', 'BMKG', 'APT Pranoto', 'Prakiraan Cuaca', 'Iklim', 'Penerbangan', 'Kalimantan Timur'],
-  
   // Konfigurasi OpenGraph (Tampilan saat share link di WhatsApp/Facebook)
   openGraph: {
     title: 'BMKG APT Pranoto Samarinda',
@@ -36,7 +35,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.png', // Pastikan Anda menyimpan file 'og-image.jpg' di folder 'public'
+        url: '/og-image.png',
         width: 1000,
         height: 1000,
         alt: 'BMKG APT Pranoto Samarinda',
@@ -55,7 +54,7 @@ export const metadata: Metadata = {
 
   // Ikon (Favicon)
   icons: {
-    icon: '/favicon.ico', // Pastikan ada favicon di folder public
+    icon: '/logo-bmkg.png', // Pastikan ada favicon di folder public
     apple: '/apple-icon.png',
   },
 };
@@ -64,7 +63,6 @@ export default function RootLayout({
   children,}: { children: React.ReactNode;}) {
   return (
     <html lang="id">
-      {/* ✅ Full light theme */}
       <body
         className={`${poppins.className} bg-gray-50 text-gray-900 flex flex-col min-h-screen`}
       >

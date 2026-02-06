@@ -5,11 +5,12 @@ import { Droplets, Wind, Sun, Gauge, ArrowRight, Radio } from "lucide-react";
 
 export interface AwsData {
   temp: number;
-  humidity: number; // Tambahan field
+  humidity: number;
   rain: number;
   windSpeed: number;
-  windDir: string;
+  windDir: number;
   solarRad: number;
+  tekanan: number;
   lastUpdate: string;
   isOnline: boolean;
 }
@@ -35,7 +36,7 @@ export default function AwsWidgetContent({ data }: AwsWidgetContentProps) {
              
              {/* Suhu */}
              <div className="text-5xl md:text-4xl font-bold text-gray-800 tracking-tight leading-none">
-                {data.temp}°C
+                {data.temp}° C
              </div>
              
              {/* Kelembaban */}
@@ -59,7 +60,7 @@ export default function AwsWidgetContent({ data }: AwsWidgetContentProps) {
                </div>
                <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-gray-800 leading-none">
-                     {data.rain} <span className="text-xs font-normal text-gray-400">mm</span>
+                     {data.rain} <span className="text-sm font-normal text-gray-400">mm</span>
                   </span>
                   <span className="text-xs text-gray-400">Curah Hujan</span>
                </div>
@@ -72,9 +73,9 @@ export default function AwsWidgetContent({ data }: AwsWidgetContentProps) {
                </div>
                <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-gray-800 leading-none">
-                     {data.windSpeed} <span className="text-xs font-normal text-gray-400">km/j</span>
+                     {data.windSpeed} <span className="text-sm font-normal text-gray-400">km/j</span>
                   </span>
-                  <span className="text-xs text-gray-400">Kec. Angin</span>
+                  <span className="text-xs text-gray-600"> Arah: {data.windDir}° </span>
                </div>
             </div>
 
@@ -85,22 +86,22 @@ export default function AwsWidgetContent({ data }: AwsWidgetContentProps) {
                </div>
                <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-gray-800 leading-none">
-                     {data.solarRad} <span className="text-xs font-normal text-gray-400">W/m²</span>
+                     {data.solarRad} <span className="text-sm font-normal text-gray-400">W/m²</span>
                   </span>
                   <span className="text-xs text-gray-400">Rad. Matahari</span>
                </div>
             </div>
 
-             {/* Kotak 4: Arah Angin */}
+             {/* Kotak 4: Tekanan */}
              <div className="flex items-center gap-3">
                <div className="p-2 rounded-lg text-blue-500 shrink-0">
                   <Gauge className="w-5 h-5" strokeWidth={2} />
                </div>
                <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-gray-800 leading-none">
-                     {data.windDir}
+                     {data.tekanan} <span className="text-sm font-normal text-gray-400">hPa</span>
                   </span>
-                  <span className="text-xs text-gray-400">Arah Angin</span>
+                  <span className="text-xs text-gray-400">Tekanan</span>
                </div>
             </div>
 
@@ -109,7 +110,7 @@ export default function AwsWidgetContent({ data }: AwsWidgetContentProps) {
         {/* Tombol Panah (Opsional, di kanan pojok) */}
         <Link
           href="/aws-samarinda"
-          className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 text-gray-400 hover:bg-emerald-500 hover:text-white transition group shrink-0 ml-2"
+          className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 text-blue-400 hover:bg-blue-500 hover:text-white transition group shrink-0 ml-2"
         >
           <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
         </Link>

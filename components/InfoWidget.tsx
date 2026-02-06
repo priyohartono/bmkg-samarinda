@@ -8,8 +8,6 @@ import {
 } from "lucide-react";
 import type { GempaData } from "@/lib/bmkg/gempa";
 import type { CuacaData } from "@/lib/bmkg/cuaca";
-
-// Import Komponen UI Baru
 import AwsWidgetContent, { AwsData } from "@/components/component-cuaca/aws/AwsWidgetContent";
 
 interface InfoWidgetProps {
@@ -38,8 +36,9 @@ export default function InfoWidget({ dataGempa, listCuaca }: InfoWidgetProps) {
     humidity: 78,
     rain: 0.0,
     windSpeed: 12.5,
-    windDir: "Tenggara",
+    windDir: 270,
     solarRad: 850,
+    tekanan: 1013,
     lastUpdate: "09:30 WITA",
     isOnline: true
   };
@@ -57,7 +56,7 @@ export default function InfoWidget({ dataGempa, listCuaca }: InfoWidgetProps) {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-20 mb-12">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-28 relative z-20 mb-12">
       <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col md:flex-row min-h-[220px]">
         
         {/* --- TAB NAVIGASI (SIDEBAR) --- */}
@@ -110,8 +109,8 @@ export default function InfoWidget({ dataGempa, listCuaca }: InfoWidgetProps) {
                     {currentCuaca ? (
                         <div key={currentCuaca.wilayah}>
                             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                                <div className="flex items-center gap-x-8">
-                                    {/* ICON */}
+                                {/* ICON */}
+                                <div className="flex items-center">
                                     {currentCuaca.iconUrl ? (
                                         <div className="w-24 h-24 relative">
                                             <img 
@@ -122,14 +121,16 @@ export default function InfoWidget({ dataGempa, listCuaca }: InfoWidgetProps) {
                                         </div>
                                     ) : (
                                         getFallbackIcon(currentCuaca.kodeCuaca)
-                                    )}
-
-                                    <div className="justify-items-center space-y-0.5">
+                                    )}   
+                                </div>
+                                {/* INFO CUACA */}
+                                <div className="flex items-center">
+                                    <div className="justify-items-center text-center space-y-0.5">
                                         <h3 className="text-gray-500 font-medium text-sm md:text-base flex items-center gap-1">
-                                            <MapPin className="w-3 h-3 text-blue-500" /> {currentCuaca.wilayah}
+                                            {currentCuaca.wilayah}
                                         </h3>
                                         <div className="text-4xl font-bold text-gray-800 my-1">
-                                            {currentCuaca.suhu}°C
+                                            {currentCuaca.suhu}<span className="text-3xl text-gray-400">°C</span>
                                         </div>
                                         <div className="text-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
                                             {currentCuaca.cuaca}
@@ -139,7 +140,8 @@ export default function InfoWidget({ dataGempa, listCuaca }: InfoWidgetProps) {
                                         </div>
                                     </div>
                                 </div>
-                                
+
+                                {/* DETAIL LAINNYA */}
                                 <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-gray-600">
                                     <div className="flex items-center gap-2">
                                         <Wind className="w-5 h-5 text-blue-400" />
@@ -171,7 +173,7 @@ export default function InfoWidget({ dataGempa, listCuaca }: InfoWidgetProps) {
 
                     {/* DOTS PAGINATION */}
                     {listCuaca && listCuaca.length > 1 && (
-                        <div className="flex justify-center items-center gap-1.5 mt-4 w-full">
+                        <div className="flex justify-center items-center gap-1.5 mt-0 w-full">
                             {listCuaca.map((_, idx) => (
                                 <button
                                     key={idx}

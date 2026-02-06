@@ -14,10 +14,6 @@ import AppPromo from "@/components/AppPromo";
 import NewsBulletinSection from "@/components/NewsBulletinSection";
 import FlyerSection from "@/components/FlyerSection";
 
-// --- NEW COMPONENT: AWS WIDGET ---
-import CityObservationPanel from '@/components/component-cuaca/aws/CityObservationPanel';
-import AwsStatusBar from '@/components/component-cuaca/aws/AwsStatusBar';
-
 // --- DATA FETCHING ---
 import { getGempaTerbaru } from "@/lib/bmkg/gempa";
 import { getKaltimWeather } from "@/lib/weather-service"; 
@@ -101,15 +97,11 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* --- [BARU] 2.5 AWS REALTIME PANEL --- */}
-      {/* Panel ini akan 'menempel' di bawah Hero, memberikan transisi visual yang bagus */}
-
       {/* 3. WIDGET CUACA & GEMPA (INFO WIDGET) */}
-      {/* Tambahkan sedikit margin-top agar tidak terlalu rapat dengan panel AWS */}
       <div className="-mt-4">
          <InfoWidget 
-           dataGempa={gempaData} 
-           listCuaca={listCuacaKaltim} 
+           dataGempa={gempaData}
+           listCuaca={listCuacaKaltim}
          />
       </div>
 

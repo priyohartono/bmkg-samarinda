@@ -73,18 +73,19 @@ export const fetchBMKGData = async (locationId: string): Promise<WeatherData | n
   }
 };
 
+
 const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData => {
   const rootMeta = json.lokasi;
   const level = getLevel(requestedId);
   
-  // Cari data spesifik lokasi (jika json berisi banyak lokasi/parent)
+  // Cari data spesifik lokasi
   let referenceData = json.data[0];
   const specificMatch = json.data.find(d => 
     d.lokasi.adm4 === requestedId || d.lokasi.adm3 === requestedId || d.lokasi.adm2 === requestedId
   );
   if (specificMatch) referenceData = specificMatch;
 
-  // AMBIL DATA TERKINI (SINKRON)
+  // AMBIL DATA TERKINI
   const refWeather = getCurrentWeatherItem(referenceData.cuaca);
   const realFeelValue = calculateFeelsLike(refWeather.t, refWeather.hu, refWeather.ws);
 
@@ -94,7 +95,7 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
   else if (level === 'district') locationName = rootMeta.kecamatan || "";
   else locationName = rootMeta.desa || "";
 
-  // Mapping Sub-regions (jika level provinsi/kota)
+  // --- LOGIKA SUB-REGIONS ---
   const subRegions = json.data.map(item => {
     const w = getCurrentWeatherItem(item.cuaca);
     let id = item.lokasi.adm4 || item.lokasi.adm3 || item.lokasi.adm2 || "";
@@ -109,10 +110,68 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
       name: name,
       level: getLevel(id) as any,
       temp: w.t,
-      condition: w.weather_desc,
-      icon: w.image, // URL Icon Subregion
+      condition: w.weather_desc, 
+      icon: w.image,
+      windSpeed: w.ws
     };
   });
+
+  // --- HITUNG STATISTIK LENGKAP ---
+  let tempRange: string | undefined = undefined;
+  let description = "";
+
+  // MODIFIKASI: Jangan tampilkan range jika level Desa/Kelurahan ATAU data cuma 1
+  const showRange = subRegions.length > 1 && level !== 'village';
+
+  if (showRange) {
+      // 1. Hitung Range Suhu (Min - Max)
+      const allTemps = subRegions.map(s => s.temp);
+      const minTemp = Math.min(...allTemps);
+      const maxTemp = Math.max(...allTemps);
+      tempRange = `${minTemp} - ${maxTemp}`;
+
+      // 2. Hitung Rata-rata Suhu
+      const totalTemp = allTemps.reduce((a, b) => a + b, 0);
+      const avgTemp = (totalTemp / allTemps.length).toFixed(1);
+
+      // 3. Hitung Range Angin
+      const allWinds = subRegions.map(s => s.windSpeed);
+      const minWind = Math.min(...allWinds);
+      const maxWind = Math.max(...allWinds);
+
+      // 4. Hitung Cuaca Dominan
+      const weatherCounts: Record<string, number> = {};
+      let dominantWeather = refWeather.weather_desc; 
+      let maxCount = 0;
+
+      subRegions.forEach(s => {
+          const cond = s.condition;
+          weatherCounts[cond] = (weatherCounts[cond] || 0) + 1;
+      });
+
+      Object.entries(weatherCounts).forEach(([weather, count]) => {
+          if (count > maxCount) {
+              maxCount = count;
+              dominantWeather = weather;
+          }
+      });
+      
+      // 5. Deskripsi Wilayah Luas (Provinsi/Kabupaten)
+      if (level === 'province') {
+          description = `Untuk wilayah Provinsi ${locationName}, kondisi cuaca dominan ${dominantWeather} dengan suhu rata-rata provinsi ${avgTemp}°C dan kecepatan angin ${minWind} sampai ${maxWind} km/j.`;
+      } else {
+          description = `Untuk wilayah ${locationName}, kondisi cuaca dominan ${dominantWeather} dengan suhu rata-rata wilayah ${avgTemp}°C dan kecepatan angin ${minWind} sampai ${maxWind} km/j.`;
+      }
+
+  } else {
+      // LOGIKA SINGLE (DESA/KELURAHAN atau KOTA Tanpa Sub-region)
+      // Tampilkan data spesifik titik tersebut
+      
+      description = `Untuk wilayah ${locationName}, kondisi cuaca saat ini ${refWeather.weather_desc} dengan suhu ${refWeather.t}°C, terasa seperti ${realFeelValue}°C, dan kecepatan angin ${refWeather.ws} km/j.`;
+      
+      // Pastikan tempRange undefined agar UI tidak masuk mode range
+      tempRange = undefined; 
+  }
 
   return {
     location: locationName,
@@ -128,19 +187,16 @@ const transformToUIData = (json: BMKGResponse, requestedId: string): WeatherData
     humidity: refWeather.hu,
     tcc: refWeather.tcc,
     feelsLike: realFeelValue,
-    
-    // Visibility
     visibility: parseFloat(refWeather.vs_text.replace(/[<>=a-zA-Z]/g, '').trim()) || 10,
-    
     uvIndex: 0,
-    subRegions: subRegions,
-    tempRange: undefined, // Bisa diaktifkan ulang jika butuh range suhu min-max
-    description: `Kondisi ${refWeather.weather_desc} dengan suhu ${refWeather.t}°C.`,
     
-    // Data Tabel (Forecast 24 Jam)
+    subRegions: subRegions,
+    tempRange: tempRange, 
+    description: description,
+    
     tableData: referenceData.cuaca.flat().map((w: BMKGWeatherItem) => ({
       time: w.local_datetime.split(' ')[1].slice(0, 5),
-      date: w.local_datetime.split(' ')[0], // Date untuk Detail View
+      date: w.local_datetime.split(' ')[0],
       weatherIcon: w.image,
       weatherDesc: w.weather_desc,
       wind: {
